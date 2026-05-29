@@ -2,6 +2,8 @@
 
 A premium, interactive Markdown-to-HTML resume builder designed to blend elegant typography with flawless ATS (Applicant Tracking System) compliance. Co-designed by **Julien Avarre** and **Antigravity** (Google DeepMind team).
 
+![Jobby MD Editor Screenshot](screenshot.png)
+
 ---
 
 ## 🌟 Key Features

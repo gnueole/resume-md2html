@@ -11,7 +11,7 @@
     "colorBody": "#042a34",
     "colorLinks": "#95abdb",
     "colorAccent": "#3d84c7",
-    "layoutMode": "2-column",
+    "layoutMode": "1-column",
     "sidebarBg": "#4e5c73",
     "sidebarText": "#ffffff",
     "sidebarPosition": "right",
