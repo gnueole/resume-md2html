@@ -213,6 +213,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         presetCleanBlue.classList.remove('active');
         presetCustom.classList.remove('active');
 
+        if (styleConfig.activePreset) {
+            if (styleConfig.activePreset === 'classic') {
+                presetClassicNb.classList.add('active');
+                return;
+            } else if (styleConfig.activePreset === 'dark') {
+                presetDarkMode.classList.add('active');
+                return;
+            } else if (styleConfig.activePreset === 'clean-blue') {
+                presetCleanBlue.classList.add('active');
+                return;
+            } else if (styleConfig.activePreset === 'custom') {
+                presetCustom.classList.add('active');
+                return;
+            }
+        }
+
         const bg = (styleConfig.colorBg || '#ffffff').toLowerCase();
         const headings = styleConfig.colorHeadings.toLowerCase();
         const body = styleConfig.colorBody.toLowerCase();
@@ -319,6 +335,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         styleConfig.sectionSpacing = sectionSpacingSlider.value;
         
         styleConfig.layoutMode = layoutModeSelect.value;
+        
+        // Detect if any color picker changed
+        if (styleConfig.colorBg !== colorBg.value ||
+            styleConfig.colorHeadings !== colorHeadings.value ||
+            styleConfig.colorBody !== colorBody.value ||
+            styleConfig.colorLinks !== colorLinks.value ||
+            styleConfig.colorAccent !== colorAccent.value ||
+            styleConfig.sidebarBg !== colorSidebarBg.value ||
+            styleConfig.sidebarText !== colorSidebarText.value) {
+            styleConfig.activePreset = 'custom';
+        }
+
         styleConfig.sidebarBg = colorSidebarBg.value;
         styleConfig.sidebarText = colorSidebarText.value;
         styleConfig.sidebarPosition = sidebarPositionSelect.value;
@@ -820,6 +848,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Wire color presets
     presetClassicNb.addEventListener('click', () => {
+        styleConfig.activePreset = 'classic';
         styleConfig.colorBg = '#ffffff';
         styleConfig.colorHeadings = '#111111';
         styleConfig.colorBody = '#222222';
@@ -831,6 +860,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     presetDarkMode.addEventListener('click', () => {
+        styleConfig.activePreset = 'dark';
         styleConfig.colorBg = '#0f172a';
         styleConfig.colorHeadings = '#f8fafc';
         styleConfig.colorBody = '#cbd5e1';
@@ -842,6 +872,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     presetCleanBlue.addEventListener('click', () => {
+        styleConfig.activePreset = 'clean-blue';
         styleConfig.colorBg = '#ffffff';
         styleConfig.colorHeadings = '#0f172a';
         styleConfig.colorBody = '#334155';
@@ -853,6 +884,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     presetCustom.addEventListener('click', () => {
+        styleConfig.activePreset = 'custom';
         styleConfig.colorBg = customColors.colorBg;
         styleConfig.colorHeadings = customColors.colorHeadings;
         styleConfig.colorBody = customColors.colorBody;
