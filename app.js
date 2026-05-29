@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Toolbar Actions
     const btnLoadSample = document.getElementById('btn-load-sample');
+    const btnCopyMd = document.getElementById('btn-copy-md');
     const btnClear = document.getElementById('btn-clear');
     const btnPrint = document.getElementById('btn-print');
     
@@ -933,6 +934,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             saveToServer();
         }
     });
+    
+    if (btnCopyMd) {
+        btnCopyMd.addEventListener('click', () => {
+            const mdContent = markdownInput.value;
+            navigator.clipboard.writeText(mdContent)
+                .then(() => showToast("Markdown copied to clipboard!"))
+                .catch(err => console.error("Clipboard copy error:", err));
+        });
+    }
 
     btnPrint.addEventListener('click', () => {
         window.print();
