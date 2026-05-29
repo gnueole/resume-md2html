@@ -31,6 +31,9 @@ const ICONS = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Launch opening fireworks celebration
+    startOpeningFireworks();
+
     // --- DOM Elements Cache ---
     const markdownInput = document.getElementById('markdown-input');
     const resumeOutput = document.getElementById('resume-output');
@@ -1303,6 +1306,169 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Compute default canvas fitting scale on startup
         setTimeout(autoFitZoom, 300);
+    }
+
+    function startOpeningFireworks() {
+        const canvas = document.createElement('canvas');
+        canvas.id = 'opening-fireworks-canvas';
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.width = '100vw';
+        canvas.style.height = '100vh';
+        canvas.style.pointerEvents = 'none';
+        canvas.style.zIndex = '99999';
+        canvas.style.transition = 'opacity 1s ease';
+        document.body.appendChild(canvas);
+
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 5 + 2;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.gravity = 0.06;
+                this.friction = 0.98;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.015 + 0.008;
+                this.size = Math.random() * 2.5 + 1;
+            }
+            update() {
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Firework {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = height;
+                this.targetY = Math.random() * (height * 0.5) + height * 0.15;
+                this.vy = - (Math.random() * 4 + 11);
+                this.vx = Math.random() * 2 - 1;
+                this.exploded = false;
+                // Elegant vibrant colors (purple, teal, emerald, gold, blue, hotpink)
+                const colors = ['#7c3aed', '#0d9488', '#10b981', '#fbbf24', '#3b82f6', '#ec4899', '#f43f5e'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.particles = [];
+            }
+            update() {
+                if (!this.exploded) {
+                    this.y += this.vy;
+                    this.x += this.vx;
+                    this.vy += 0.12; // rocket gravity
+                    if (this.vy >= 0 || this.y <= this.targetY) {
+                        this.exploded = true;
+                        this.explode();
+                    }
+                } else {
+                    for (let i = this.particles.length - 1; i >= 0; i--) {
+                        const p = this.particles[i];
+                        p.update();
+                        if (p.alpha <= 0) {
+                            this.particles.splice(i, 1);
+                        }
+                    }
+                }
+            }
+            explode() {
+                const count = Math.floor(Math.random() * 40) + 50;
+                for (let i = 0; i < count; i++) {
+                    this.particles.push(new Particle(this.x, this.y, this.color));
+                }
+            }
+            draw() {
+                if (!this.exploded) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = this.color;
+                    ctx.fill();
+                    ctx.restore();
+                } else {
+                    for (let p of this.particles) {
+                        p.draw();
+                    }
+                }
+            }
+        }
+
+        const fireworks = [];
+        let animationFrameId;
+        let isRunning = true;
+
+        // Launch rocket interval
+        let launchInterval = setInterval(() => {
+            if (isRunning && fireworks.length < 12) {
+                fireworks.push(new Firework());
+            }
+        }, 320);
+
+        // Pre-launch a few fireworks instantly on load for immediate effect
+        for (let i = 0; i < 4; i++) {
+            setTimeout(() => {
+                if (isRunning) fireworks.push(new Firework());
+            }, i * 200);
+        }
+
+        function loop() {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                const f = fireworks[i];
+                f.update();
+                f.draw();
+                if (f.exploded && f.particles.length === 0) {
+                    fireworks.splice(i, 1);
+                }
+            }
+
+            if (isRunning || fireworks.length > 0) {
+                animationFrameId = requestAnimationFrame(loop);
+            }
+        }
+
+        loop();
+
+        // Stop launching after 3 seconds, fade out and remove canvas after 4 seconds
+        setTimeout(() => {
+            clearInterval(launchInterval);
+            isRunning = false;
+            canvas.style.opacity = '0';
+            setTimeout(() => {
+                cancelAnimationFrame(animationFrameId);
+                canvas.remove();
+            }, 1000);
+        }, 3000);
     }
 
     // Launch loading
