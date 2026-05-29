@@ -1,8 +1,8 @@
-# JULIEN AVARRE
+# ÉOLE WIND
 **SENIOR ENTERPRISE SOLUTIONS ENGINEER | 20+ YEARS IN TECH & PROJECT COORDINATION**
-Paris, France | julien@avarre.com | +33 6 50 83 68 09 | https://www.linkedin.com/in/javarre
+Paris, France | jobby@jobby.com | +33 123139123 | https://www.linkedin.com/in/javarre
 
-### "JOBBY" : THE ATS Opener
+## "JOBBY" : THE ATS Opener
 As a long-time Notion power user, I previously found my senior Solutions Engineer profile hitting a wall against rigid, automated ATS filters. As a builder, I decided to engineer a solution. 
 
 I built **Jobby**: my self-hosted automation pipeline (Docker on VPS, n8n workflows) that ingests job descriptions, normalizes them into a custom-designed relational Notion database, and leverages LLMs via REST APIs to map requirements against my atomized Notion profile, generating tailored Markdown applications. 
@@ -27,7 +27,7 @@ If I deployed this level of engineering just to get this resume into your hands,
 * Orchestrated cross-functional delivery in complex technical environments, aligning scope, stakeholders, and execution plans to keep large-scale programs on time and within budget.
 * Structured incident/change management practices and technical documentation to significantly improve system reliability, predictability, and operational continuity.
 
-## TECHNICAL EXPERTISE
+### TECHNICAL EXPERTISE
 **Notion** (Certified & Power User) • Enterprise Presales • Solutions Engineering • Technical Project Coordination (20+ Years) • RFP & Security Questionnaires • Technical Discovery • Stakeholder Mapping • Value-based Demos • Integration & Deployment Planning • Workflow Automation (n8n, Zapier, Make) • REST APIs (Python, Bash, Javascript) • Relational Databases (Database Design, Relations, Rollups)
 
 ### COGNITIVE AGILITY & RESILIENCE

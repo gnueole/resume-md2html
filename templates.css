@@ -80,7 +80,7 @@
     color: var(--resume-sidebar-text, #ffffff);
 }
 
-#resume-output .resume-sidebar-col p strong {
+#resume-output .resume-sidebar-col strong {
     color: var(--resume-sidebar-headings, var(--resume-sidebar-text, #ffffff));
 }
 
@@ -185,8 +185,8 @@
 }
 
 /* Sub-headings / job blocks (typically bold text for titles) */
-#resume-output p strong {
-    font-weight: 600;
+#resume-output strong {
+    font-weight: 700;
     color: var(--resume-color-headings, #1e293b);
 }
 
@@ -251,10 +251,10 @@
         print-color-adjust: exact !important;
     }
     
-    /* Set page margins in printer settings dynamically */
+    /* Let HTML padding handle the page margins for customizer control */
     @page {
         size: A4 portrait;
-        margin: 15mm; /* Balanced printing margins */
+        margin: 0;
     }
 
     /* Hide entire builder UI */
@@ -315,7 +315,7 @@
     .a4-sheet {
         box-shadow: none !important;
         border-radius: 0 !important;
-        padding: 0 !important; /* Managed by @page margin */
+        padding: var(--resume-margin-y, 25px) var(--resume-margin-x, 30px) !important;
         width: 100% !important;
         min-height: 0 !important;
         background: var(--resume-color-bg, #ffffff) !important;
