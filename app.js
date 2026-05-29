@@ -31,9 +31,6 @@ const ICONS = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Launch opening fireworks celebration
-    startOpeningFireworks();
-
     // --- DOM Elements Cache ---
     const markdownInput = document.getElementById('markdown-input');
     const resumeOutput = document.getElementById('resume-output');
@@ -806,6 +803,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- About Modal Listeners ---
     btnAbout.addEventListener('click', () => {
         aboutModal.classList.add('show');
+        startOpeningFireworks();
     });
 
     btnCloseModal.addEventListener('click', () => {
