@@ -110,8 +110,6 @@
 }
 
 #resume-output p {
-    margin-top: 0;
-    margin-bottom: 0;
     font-size: var(--resume-font-size, 14px);
     color: var(--resume-color-body, #334155);
 }
@@ -194,12 +192,35 @@
 /* Lists and Bullet Points - critical for ATS readability */
 #resume-output ul {
     margin-left: 18px;
-    margin-top: 0;
-    margin-bottom: 0;
     padding-left: 0;
 }
 
-#resume-output p + ul {
+/* --- 1-COLUMN MODE SPACING (Direct children of #resume-output) --- */
+#resume-output > p {
+    margin-top: calc(var(--resume-section-spacing, 12px) * 0.8);
+    margin-bottom: 0;
+}
+
+#resume-output > ul {
+    margin-top: 4px;
+    margin-bottom: calc(var(--resume-section-spacing, 12px) * 0.8);
+}
+
+/* --- 2-COLUMN MODE SPACING (Inside flex columns) --- */
+#resume-output .resume-main-col p,
+#resume-output .resume-sidebar-col p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#resume-output .resume-main-col ul,
+#resume-output .resume-sidebar-col ul {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#resume-output .resume-main-col p + ul,
+#resume-output .resume-sidebar-col p + ul {
     margin-top: calc(var(--resume-section-spacing, 12px) * -0.7);
 }
 
