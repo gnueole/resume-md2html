@@ -116,6 +116,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnCopyCss = document.getElementById('btn-copy-css');
     const btnCopyHtml = document.getElementById('btn-copy-html');
     const btnDownloadMd = document.getElementById('btn-download-md');
+    const btnSyncN8n = document.getElementById('btn-sync-n8n');
+    const n8nWebhookUrl = document.getElementById('n8n-webhook-url');
     
     // Toast Alert
     const toast = document.getElementById('toast');
@@ -1053,6 +1055,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         URL.revokeObjectURL(url);
         showToast("Markdown download started!");
     });
+
+    // 5. Sync Config to n8n Webhook
+    if (n8nWebhookUrl) {
+        n8nWebhookUrl.value = localStorage.getItem('n8n_webhook_url') || '';
+    }
+
+    if (btnSyncN8n && n8nWebhookUrl) {
+        btnSyncN8n.addEventListener('click', () => {
+            const url = n8nWebhookUrl.value.trim();
+            if (!url) {
+                showToast("Please enter an n8n webhook URL first!");
+                return;
+            }
+            
+            localStorage.setItem('n8n_webhook_url', url);
+            
+            const payload = {
+                config: styleConfig,
+                css: templatesCssText
+            };
+            
+            btnSyncN8n.disabled = true;
+            const originalText = btnSyncN8n.textContent;
+            btnSyncN8n.textContent = "Syncing...";
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => {
+                if (res.ok) {
+                    showToast("Design configuration synced successfully!");
+                } else {
+                    throw new Error("HTTP " + res.status);
+                }
+            })
+            .catch(err => {
+                console.error("n8n sync failed:", err);
+                showToast("Sync failed: " + err.message);
+            })
+            .finally(() => {
+                btnSyncN8n.disabled = false;
+                btnSyncN8n.textContent = originalText;
+            });
+        });
+    }
 
     // --- Column Resizing Handles ---
     const handleLeft = document.getElementById('handle-left');
