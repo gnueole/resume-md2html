@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load templates.css stylesheet code for n8n embedding
     try {
-        const response = await fetch('templates.css?v=1.2.5');
+        const response = await fetch('templates.css?v=1.2.6');
         if (response.ok) {
             templatesCssText = await response.text();
         }

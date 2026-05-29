@@ -24,6 +24,10 @@
     --danger: #ef4444;
     --danger-bg: rgba(239, 68, 68, 0.1);
     
+    --bg-button-secondary: rgba(255, 255, 255, 0.08);
+    --bg-button-secondary-hover: rgba(255, 255, 255, 0.12);
+    --slider-track-bg: rgba(255, 255, 255, 0.1);
+    
     --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --transition-speed: 0.2s;
     
@@ -65,12 +69,15 @@
     --bg-editor: #fdfbf7; /* Warm Paper cream background - immediately suggests editing area */
     --bg-preview: #cbd5e1; /* Neutral cool gray behind A4 canvas sheet */
     --bg-control-group: #e2e8f0; /* Muted slate background for control groups */
-    --bg-input: #ffffff; /* Clean white inputs for focus mapping */
+    --bg-input: #f1f5f9; /* Soft grey inputs instead of bright white */
     --bg-wrapper: rgba(15, 23, 42, 0.04);
     --bg-modal: #ffffff;
     --bg-modal-directives: rgba(15, 23, 42, 0.04);
     --text-editor: #0f172a;
     --bg-panel-header: #e2e8f0; /* Muted header for panels */
+    --bg-button-secondary: #cbd5e1; /* Softer dark-grey button background */
+    --bg-button-secondary-hover: #b8c6d6; /* Distinct hover gray button */
+    --slider-track-bg: #cbd5e1; /* Highly visible range slider track line */
 }
 
 * {
@@ -424,7 +431,7 @@ input[type="range"] {
     width: 100%;
     height: 4px;
     border-radius: 2px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--slider-track-bg, rgba(255, 255, 255, 0.1));
     outline: none;
     margin: 8px 0;
 }
@@ -621,14 +628,14 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .btn-secondary {
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: var(--bg-button-secondary, rgba(255, 255, 255, 0.08));
     color: var(--text-primary);
     border: 1px solid var(--border-color);
 }
 
 .btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--bg-button-secondary-hover, rgba(255, 255, 255, 0.12));
+    border-color: var(--border-color-hover, rgba(255, 255, 255, 0.2));
 }
 
 .btn-outline {
