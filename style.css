@@ -45,12 +45,12 @@
 
 /* Light Theme Overrides */
 [data-theme="light"] {
-    --bg-main: #f1f5f9; /* Soft cool-gray background */
-    --bg-panel: #ffffff; /* Clean white card layout background */
-    --bg-header: #ffffff;
-    --border-color: rgba(15, 23, 42, 0.06);
+    --bg-main: #cbd5e1; /* Soft slate gray frame background */
+    --bg-panel: #f1f5f9; /* Soft cool gray panels */
+    --bg-header: #e2e8f0; /* Muted slate header to avoid stark white glare */
+    --border-color: rgba(15, 23, 42, 0.09);
     
-    --text-primary: #1e293b; /* Dark slate (softer than black) */
+    --text-primary: #1e293b; /* Dark slate text */
     --text-secondary: #475569;
     --text-muted: #64748b;
     
@@ -62,15 +62,15 @@
     --warning-bg: rgba(245, 158, 11, 0.12);
     --danger-bg: rgba(239, 68, 68, 0.12);
 
-    --bg-editor: #f8fafc; /* Softer off-white to reduce glare in the editing area */
-    --bg-preview: #cbd5e1; /* Smooth medium slate grey behind the canvas sheet */
-    --bg-control-group: #f8fafc; /* Soft grey-blue background for control groups */
-    --bg-input: #ffffff;
-    --bg-wrapper: rgba(15, 23, 42, 0.03);
+    --bg-editor: #fdfbf7; /* Warm Paper cream background - immediately suggests editing area */
+    --bg-preview: #cbd5e1; /* Neutral cool gray behind A4 canvas sheet */
+    --bg-control-group: #e2e8f0; /* Muted slate background for control groups */
+    --bg-input: #ffffff; /* Clean white inputs for focus mapping */
+    --bg-wrapper: rgba(15, 23, 42, 0.04);
     --bg-modal: #ffffff;
     --bg-modal-directives: rgba(15, 23, 42, 0.04);
-    --text-editor: #1e293b;
-    --bg-panel-header: #f8fafc; /* Soft headers for panels */
+    --text-editor: #0f172a;
+    --bg-panel-header: #e2e8f0; /* Muted header for panels */
 }
 
 * {
@@ -268,6 +268,10 @@ body {
     overflow: hidden;
     position: relative;
     background-color: var(--bg-editor);
+    transition: box-shadow 0.2s ease;
+}
+.editor-container:focus-within {
+    box-shadow: inset 0 0 0 2px var(--accent), 0 0 12px var(--accent-glow);
 }
 
 #markdown-input {
