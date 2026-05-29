@@ -1,0 +1,19 @@
+{
+    "fontFamily": "'Inter', sans-serif",
+    "fontSize": "12.5",
+    "lineHeight": "1.2",
+    "headingScale": "1.6",
+    "marginX": "48",
+    "marginY": "20",
+    "sectionSpacing": "12",
+    "colorBg": "#ffffff",
+    "colorHeadings": "#0d6296",
+    "colorBody": "#042a34",
+    "colorLinks": "#2563eb",
+    "colorAccent": "#0ea5e9",
+    "layoutMode": "1-column",
+    "sidebarBg": "#2d3748",
+    "sidebarText": "#ffffff",
+    "sidebarPosition": "right",
+    "sidebarSections": "EDUCATION,TECHNICAL SKILLS"
+}

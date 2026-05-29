@@ -1,0 +1,296 @@
+/* ==========================================
+   ATS RESUME RENDERING AND PRINT TEMPLATES
+   ========================================== */
+
+/* The A4 Canvas Sheet Simulator (Screen-only) */
+.a4-sheet {
+    background-color: var(--resume-color-bg, #ffffff);
+    color: var(--resume-color-body, #334155);
+    font-family: var(--resume-font-family, 'Raleway', sans-serif);
+    font-size: var(--resume-font-size, 14px);
+    line-height: var(--resume-line-height, 1.45);
+    
+    padding: var(--resume-margin-y, 25px) var(--resume-margin-x, 30px);
+    
+    width: 210mm;
+    min-height: 297mm;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-align: left;
+    
+    /* Smooth transitions for slider adjustments */
+    transition: padding 0.15s ease-out;
+}
+
+/* 2-Column Layout CSS Rules */
+.resume-columns {
+    display: grid;
+    grid-template-columns: 1.7fr 1.3fr;
+    gap: 20px;
+    align-items: stretch;
+    margin-top: 16px;
+}
+
+.resume-columns.sidebar-left {
+    grid-template-columns: 1.3fr 1.7fr;
+}
+
+.resume-main-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--resume-section-spacing, 12px);
+}
+
+.resume-sidebar-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--resume-section-spacing, 12px);
+    background-color: var(--resume-sidebar-bg, #2d3748);
+    color: var(--resume-sidebar-text, #ffffff);
+    padding: 18px;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+/* Sidebar Specific Content Overrides */
+#resume-output .resume-sidebar-col h3 {
+    color: var(--resume-sidebar-headings, var(--resume-sidebar-text, #ffffff));
+    border-bottom: 1.5px solid var(--resume-color-accent, #0d9488);
+    margin-top: calc(var(--resume-section-spacing, 12px) * 0.5);
+    padding-bottom: 4px;
+}
+
+#resume-output .resume-sidebar-col p {
+    color: var(--resume-sidebar-text, #ffffff);
+}
+
+#resume-output .resume-sidebar-col p strong {
+    color: var(--resume-sidebar-headings, var(--resume-sidebar-text, #ffffff));
+}
+
+#resume-output .resume-sidebar-col li {
+    color: var(--resume-sidebar-text, #ffffff);
+}
+
+#resume-output .resume-sidebar-col li::marker {
+    color: var(--resume-color-accent, #0d9488);
+}
+
+#resume-output .resume-sidebar-col a {
+    color: var(--resume-sidebar-text, #ffffff);
+    text-decoration: underline;
+}
+
+/* Resume Markdown HTML Output Elements Styling */
+
+#resume-output h1 {
+    font-family: var(--resume-font-family, 'Raleway', sans-serif);
+    font-size: calc(var(--resume-font-size, 14px) * var(--resume-heading-scale, 1.6) * 1.5);
+    color: var(--resume-color-headings, #1e293b);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+}
+
+#resume-output p {
+    margin-bottom: 8px;
+    font-size: var(--resume-font-size, 14px);
+    color: var(--resume-color-body, #334155);
+}
+
+/* Subtitles or roles (typically bold text right after h1) */
+#resume-output h1 + p strong,
+#resume-output h1 + p {
+    font-size: calc(var(--resume-font-size, 14px) * 1.05);
+    color: var(--resume-color-accent, #0d9488);
+    font-weight: 600;
+}
+
+/* Contact Details Paragraph (e.g. [CONTACT : ...]) */
+#resume-output .resume-contact-bar {
+    font-size: calc(var(--resume-font-size, 14px) * 0.85);
+    color: var(--resume-color-links, #7c3aed);
+    background-color: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    display: block;
+    word-break: break-all;
+}
+
+/* Links inside the document */
+#resume-output a {
+    color: var(--resume-color-links, #7c3aed);
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.15s ease;
+}
+
+#resume-output a:hover {
+    text-decoration: underline;
+    opacity: 0.95;
+}
+
+/* Horizontal separators */
+#resume-output hr {
+    border: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    margin: 16px 0;
+}
+
+/* Blockquotes (used for Summary Quotes) */
+#resume-output blockquote {
+    border-left: 3px solid var(--resume-color-accent, #0d9488);
+    padding-left: 14px;
+    margin: 16px 0;
+    font-style: italic;
+    color: var(--resume-color-body, #475569);
+    font-size: calc(var(--resume-font-size, 14px) * 1.02);
+    line-height: 1.5;
+}
+
+/* Section Headings (e.g., ### EXPÉRIENCES CLÉS) */
+#resume-output h3 {
+    font-family: var(--resume-font-family, 'Raleway', sans-serif);
+    font-size: calc(var(--resume-font-size, 14px) * var(--resume-heading-scale, 1.6));
+    color: var(--resume-color-headings, #1e293b);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: calc(var(--resume-section-spacing, 12px) * 1.8);
+    margin-bottom: calc(var(--resume-section-spacing, 12px) * 0.8);
+    border-bottom: 1.5px solid var(--resume-color-accent, #0d9488);
+    padding-bottom: 4px;
+    display: block;
+}
+
+/* Sub-headings / job blocks (typically bold text for titles) */
+#resume-output p strong {
+    font-weight: 600;
+    color: var(--resume-color-headings, #1e293b);
+}
+
+/* Lists and Bullet Points - critical for ATS readability */
+#resume-output ul {
+    margin-left: 18px;
+    margin-bottom: 12px;
+    padding-left: 0;
+}
+
+#resume-output li {
+    font-size: calc(var(--resume-font-size, 14px) * 0.96);
+    margin-bottom: 4px;
+    line-height: 1.45;
+    color: var(--resume-color-body, #334155);
+    /* Standard bullets only, no graphics */
+    list-style-type: disc;
+}
+
+#resume-output li::marker {
+    color: var(--resume-color-accent, #0d9488);
+}
+
+/* Ensure no page breaks inside job details or blocks in print */
+#resume-output p, 
+#resume-output ul, 
+#resume-output h3 {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+/* Custom directives styling matching markdownresume.app guide */
+.resume-accent {
+    color: var(--resume-color-accent, #0d9488);
+    font-weight: 600;
+}
+
+.resume-muted {
+    color: #64748b;
+    font-size: 0.95em;
+    opacity: 0.85;
+}
+
+/* ==========================================
+   STRICT PRINT-TO-PDF STYLING OVERRIDES
+   ========================================== */
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    /* Set page margins in printer settings dynamically */
+    @page {
+        size: A4 portrait;
+        margin: 15mm; /* Balanced printing margins */
+    }
+
+    /* Hide entire builder UI */
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: var(--resume-font-size, 12px) !important;
+        height: auto !important;
+        width: auto !important;
+        overflow: visible !important;
+    }
+
+    .app-header, 
+    .panel:not(.preview-panel),
+    .panel-header,
+    .preview-controls,
+    .toast {
+        display: none !important;
+    }
+
+    .app-container {
+        display: block !important;
+        height: auto !important;
+        width: 100% !important;
+        background: none !important;
+    }
+
+    .app-main {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important;
+        background: none !important;
+    }
+
+    .preview-panel {
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        border: none !important;
+        background: none !important;
+        overflow: visible !important;
+    }
+
+    .preview-canvas-wrapper {
+        padding: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+        background: none !important;
+    }
+
+    .preview-canvas {
+        transform: none !important;
+        width: 100% !important;
+        height: auto !important;
+        display: block !important;
+    }
+
+    .a4-sheet {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important; /* Managed by @page margin */
+        width: 100% !important;
+        min-height: 0 !important;
+        background: var(--resume-color-bg, #ffffff) !important;
+        color: var(--resume-color-body, #334155) !important;
+    }
+}
