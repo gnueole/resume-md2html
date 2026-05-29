@@ -45,32 +45,32 @@
 
 /* Light Theme Overrides */
 [data-theme="light"] {
-    --bg-main: #cbd5e1; /* Darker grey background for layout */
-    --bg-panel: #f1f5f9; /* Soft grey panels */
+    --bg-main: #f1f5f9; /* Soft cool-gray background */
+    --bg-panel: #ffffff; /* Clean white card layout background */
     --bg-header: #ffffff;
-    --border-color: rgba(15, 23, 42, 0.08);
+    --border-color: rgba(15, 23, 42, 0.06);
     
-    --text-primary: #0f172a;
+    --text-primary: #1e293b; /* Dark slate (softer than black) */
     --text-secondary: #475569;
     --text-muted: #64748b;
     
     --accent: #7c3aed;
     --accent-hover: #6d28d9;
-    --accent-glow: rgba(124, 58, 237, 0.1);
+    --accent-glow: rgba(124, 58, 237, 0.08);
     
-    --success-bg: rgba(16, 185, 129, 0.15);
-    --warning-bg: rgba(245, 158, 11, 0.15);
-    --danger-bg: rgba(239, 68, 68, 0.15);
+    --success-bg: rgba(16, 185, 129, 0.12);
+    --warning-bg: rgba(245, 158, 11, 0.12);
+    --danger-bg: rgba(239, 68, 68, 0.12);
 
-    --bg-editor: #ffffff; /* White background for the markdown input area */
-    --bg-preview: #94a3b8; /* Medium slate grey background for the preview panel */
-    --bg-control-group: #ffffff;
+    --bg-editor: #f8fafc; /* Softer off-white to reduce glare in the editing area */
+    --bg-preview: #cbd5e1; /* Smooth medium slate grey behind the canvas sheet */
+    --bg-control-group: #f8fafc; /* Soft grey-blue background for control groups */
     --bg-input: #ffffff;
-    --bg-wrapper: rgba(15, 23, 42, 0.04);
+    --bg-wrapper: rgba(15, 23, 42, 0.03);
     --bg-modal: #ffffff;
-    --bg-modal-directives: rgba(15, 23, 42, 0.05);
-    --text-editor: #0f172a;
-    --bg-panel-header: rgba(15, 23, 42, 0.02);
+    --bg-modal-directives: rgba(15, 23, 42, 0.04);
+    --text-editor: #1e293b;
+    --bg-panel-header: #f8fafc; /* Soft headers for panels */
 }
 
 * {
