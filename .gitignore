@@ -16,3 +16,7 @@ desktop.ini
 *.njsproj
 *.sln
 *.swp
+
+# Toolkit
+toolkit/
+

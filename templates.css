@@ -40,6 +40,12 @@
     display: flex;
     flex-direction: column;
     gap: var(--resume-section-spacing, 12px);
+    padding-top: 18px; /* Alignment with sidebar's padding-top */
+}
+
+.resume-main-col > *:first-child,
+.resume-sidebar-col > *:first-child {
+    margin-top: 0 !important;
 }
 
 .resume-sidebar-col {
@@ -54,11 +60,20 @@
 }
 
 /* Sidebar Specific Content Overrides */
-#resume-output .resume-sidebar-col h3 {
+#resume-output .resume-sidebar-col h2 {
     color: var(--resume-sidebar-headings, var(--resume-sidebar-text, #ffffff));
     border-bottom: 1.5px solid var(--resume-color-accent, #0d9488);
     margin-top: calc(var(--resume-section-spacing, 12px) * 0.5);
     padding-bottom: 4px;
+}
+
+#resume-output .resume-sidebar-col h3 {
+    color: var(--resume-sidebar-headings, var(--resume-sidebar-text, #ffffff));
+    font-size: calc(var(--resume-font-size, 14px) * var(--resume-heading-scale, 1.6) * 0.75);
+    margin-top: calc(var(--resume-section-spacing, 12px) * 0.5);
+    margin-bottom: calc(var(--resume-section-spacing, 12px) * 0.6);
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
 #resume-output .resume-sidebar-col p {
@@ -153,7 +168,8 @@
     line-height: 1.5;
 }
 
-/* Section Headings (e.g., ### EXPÉRIENCES CLÉS) */
+/* H2 Section Headings (e.g., ## EXPÉRIENCES CLÉS) and H3 headings in 1-column */
+#resume-output h2,
 #resume-output h3 {
     font-family: var(--resume-font-family, 'Raleway', sans-serif);
     font-size: calc(var(--resume-font-size, 14px) * var(--resume-heading-scale, 1.6));
@@ -194,9 +210,21 @@
     color: var(--resume-color-accent, #0d9488);
 }
 
+/* Page Break Management */
+#resume-output h1,
+#resume-output h2,
+#resume-output h3,
+#resume-output h4,
+#resume-output h5,
+#resume-output h6 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+}
+
 /* Ensure no page breaks inside job details or blocks in print */
 #resume-output p, 
 #resume-output ul, 
+#resume-output h2,
 #resume-output h3 {
     page-break-inside: avoid;
     break-inside: avoid;
@@ -292,5 +320,23 @@
         min-height: 0 !important;
         background: var(--resume-color-bg, #ffffff) !important;
         color: var(--resume-color-body, #334155) !important;
+    }
+
+    /* Print layout overrides for columns to prevent Chrome CSS Grid splitting bugs */
+    .resume-columns {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 20px !important;
+    }
+    .resume-columns.sidebar-left {
+        flex-direction: row-reverse !important;
+    }
+    .resume-main-col {
+        width: 58% !important;
+        flex-shrink: 0 !important;
+    }
+    .resume-sidebar-col {
+        width: 38% !important;
+        flex-shrink: 0 !important;
     }
 }

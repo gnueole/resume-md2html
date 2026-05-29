@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load templates.css stylesheet code for n8n embedding
     try {
-        const response = await fetch('templates.css');
+        const response = await fetch('templates.css?v=1.2.3');
         if (response.ok) {
             templatesCssText = await response.text();
         }
@@ -380,60 +380,74 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateZoomDisplay();
     }
 
-    let lastSectionTitles = [];
+    let lastSectionsJSON = "";
     
-    function updateSidebarChecklist(sectionTitles) {
-        // Compare with last section titles to avoid redrawing if unchanged
-        const isSame = sectionTitles.length === lastSectionTitles.length &&
-                       sectionTitles.every((val, index) => val === lastSectionTitles[index]);
-                       
-        if (isSame) {
-            // Keep checkbox states in sync with config just in case
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function updateHeaderInMarkdown(title, toSidebar) {
+        const mdText = markdownInput.value;
+        const lines = mdText.split('\n');
+        const escapedTitle = escapeRegExp(title.trim().toLowerCase());
+        
+        // Match lines starting with ## or ### and followed by the title
+        const headerRegex = new RegExp(`^(##|###)\\s+(${escapedTitle})\\s*$`, 'i');
+        
+        let updated = false;
+        const newLines = lines.map(line => {
+            const match = line.match(headerRegex);
+            if (match) {
+                updated = true;
+                const newHeader = toSidebar ? '###' : '##';
+                return `${newHeader} ${line.substring(match[1].length).trim()}`;
+            }
+            return line;
+        });
+        
+        if (updated) {
+            markdownInput.value = newLines.join('\n');
+            // Recompile markdown to update preview
+            compileMarkdown(markdownInput.value);
+            saveToServer();
+        }
+    }
+
+    function updateSidebarChecklist(sections) {
+        const sectionsJSON = JSON.stringify(sections);
+        if (sectionsJSON === lastSectionsJSON) {
+            // Keep checkbox states in sync with current section states
             const checkboxes = sidebarChecklistContainer.querySelectorAll('input[type="checkbox"]');
-            const sidebarNames = (styleConfig.sidebarSections || "").split(',').map(s => s.trim().toLowerCase());
-            checkboxes.forEach(cb => {
-                cb.checked = sidebarNames.includes(cb.value.toLowerCase());
+            checkboxes.forEach((cb, index) => {
+                if (sections[index]) {
+                    cb.checked = sections[index].isSidebar;
+                }
             });
             return;
         }
         
-        lastSectionTitles = [...sectionTitles];
+        lastSectionsJSON = sectionsJSON;
         sidebarChecklistContainer.innerHTML = '';
         
-        if (sectionTitles.length === 0) {
-            sidebarChecklistContainer.innerHTML = '<span style="font-size:10px; color:var(--text-muted); font-style:italic; padding: 4px;">No sections detected (headers starting with "###")</span>';
+        if (sections.length === 0) {
+            sidebarChecklistContainer.innerHTML = '<span style="font-size:10px; color:var(--text-muted); font-style:italic; padding: 4px;">No sections detected (headers starting with "##" or "###")</span>';
             return;
         }
         
-        const sidebarNames = (styleConfig.sidebarSections || "")
-            .split(',')
-            .map(s => s.trim().toLowerCase());
+        sections.forEach(section => {
+            const title = section.title;
+            const isSidebar = section.isSidebar;
             
-        sectionTitles.forEach(title => {
-            const isDefaultSidebar = ['competence', 'compétence', 'skill', 'formation', 'education', 'éducation'].some(kw => title.toLowerCase().includes(kw));
-            
-            // Check if title is saved in sidebarSections or if it's default sidebar keyword and sidebarSections isn't loaded yet
-            const isChecked = styleConfig.sidebarSections !== undefined
-                ? sidebarNames.includes(title.toLowerCase())
-                : isDefaultSidebar;
-                
             const item = document.createElement('label');
             item.className = 'sidebar-checklist-item';
             
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.value = title;
-            checkbox.checked = isChecked;
+            checkbox.checked = isSidebar;
             
             checkbox.addEventListener('change', () => {
-                const checkboxes = sidebarChecklistContainer.querySelectorAll('input[type="checkbox"]');
-                const checkedTitles = Array.from(checkboxes)
-                    .filter(cb => cb.checked)
-                    .map(cb => cb.value);
-                    
-                styleConfig.sidebarSections = checkedTitles.join(',');
-                compileMarkdown(markdownInput.value);
-                saveToServer();
+                updateHeaderInMarkdown(title, checkbox.checked);
             });
             
             item.appendChild(checkbox);
@@ -487,50 +501,42 @@ document.addEventListener('DOMContentLoaded', async () => {
             const bodyElements = Array.from(doc.body.children);
             
             const headerElements = [];
-            const sections = [];
-            let currentSection = null;
-            let foundFirstH3 = false;
+            const mainColElements = [];
+            const sidebarColElements = [];
+            
+            let currentDest = null;
+            let foundFirstHeading = false;
             
             for (let el of bodyElements) {
-                if (el.tagName === 'H3') {
-                    foundFirstH3 = true;
-                    currentSection = {
-                        title: el.textContent.trim(),
-                        elements: [el.cloneNode(true)]
-                    };
-                    sections.push(currentSection);
-                } else if (!foundFirstH3) {
+                if (el.tagName === 'H2') {
+                    foundFirstHeading = true;
+                    currentDest = mainColElements;
+                    currentDest.push(el.cloneNode(true));
+                } else if (el.tagName === 'H3') {
+                    foundFirstHeading = true;
+                    currentDest = sidebarColElements;
+                    currentDest.push(el.cloneNode(true));
+                } else if (!foundFirstHeading) {
                     headerElements.push(el.cloneNode(true));
                 } else {
-                    if (currentSection) {
-                        currentSection.elements.push(el.cloneNode(true));
+                    if (currentDest) {
+                        currentDest.push(el.cloneNode(true));
                     } else {
                         headerElements.push(el.cloneNode(true));
                     }
                 }
             }
             
-            // Build/update checklist from the parsed section titles
-            updateSidebarChecklist(sections.map(s => s.title));
+            // Build checklist of all sections (all H2 and H3 headings)
+            const allSections = Array.from(doc.querySelectorAll('h2, h3')).map(h => ({
+                title: h.textContent.trim(),
+                isSidebar: h.tagName.toLowerCase() === 'h3'
+            }));
+            updateSidebarChecklist(allSections);
             
-            // Separate sections
-            const sidebarNames = (styleConfig.sidebarSections || "").split(',').map(s => s.trim().toLowerCase());
-            const mainColSections = [];
-            const sidebarColSections = [];
-            
-            sections.forEach(sec => {
-                const titleLower = sec.title.toLowerCase();
-                if (sidebarNames.includes(titleLower)) {
-                    sidebarColSections.push(sec);
-                } else {
-                    mainColSections.push(sec);
-                }
-            });
-            
-            // Render columns
             const headerHtml = headerElements.map(el => el.outerHTML).join('\n');
-            const mainHtml = mainColSections.map(sec => sec.elements.map(el => el.outerHTML).join('\n')).join('\n');
-            const sidebarHtml = sidebarColSections.map(sec => sec.elements.map(el => el.outerHTML).join('\n')).join('\n');
+            const mainHtml = mainColElements.map(el => el.outerHTML).join('\n');
+            const sidebarHtml = sidebarColElements.map(el => el.outerHTML).join('\n');
             
             finalHtml = `
                 <div class="resume-header">
@@ -546,11 +552,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             `;
         } else {
-            // In 1-column mode, still extract section titles for the checklist
+            // In 1-column mode, all H2 and H3 are rendered sequentially
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            const h3Titles = Array.from(doc.querySelectorAll('h3')).map(h => h.textContent.trim());
-            updateSidebarChecklist(h3Titles);
+            const allSections = Array.from(doc.querySelectorAll('h2, h3')).map(h => ({
+                title: h.textContent.trim(),
+                isSidebar: h.tagName.toLowerCase() === 'h3'
+            }));
+            updateSidebarChecklist(allSections);
         }
 
         resumeOutput.innerHTML = finalHtml;

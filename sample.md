@@ -10,7 +10,7 @@
 
 ---
 
-### EXPÉRIENCES CLÉS
+## EXPÉRIENCES CLÉS
 
 **Solutions Engineer (Expertise Tooling & RFPs)** | Diabolocom | 2025 - présent
 - Cadrage et pilotage de cycles enterprise (discovery, qualification, PoC) en traduisant les enjeux CX en exigences techniques (sécurité, intégrations, scalabilité).

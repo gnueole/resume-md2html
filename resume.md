@@ -1,46 +1,40 @@
 # JULIEN AVARRE
-## Enterprise Solutions Engineer (AI Voice / Generative Media)  
+**SENIOR ENTERPRISE SOLUTIONS ENGINEER | 20+ YEARS IN TECH & PROJECT COORDINATION**
+Paris, France | julien@avarre.com | +33 6 50 83 68 09 | https://www.linkedin.com/in/javarre
 
-Paris, France | julien.avarre@example.com | +33 6 00 00 00 00 | https://www.linkedin.com/in/julien-avarre
+### "JOBBY" : THE ATS Opener
+As a long-time Notion power user, I previously found my senior Solutions Engineer profile hitting a wall against rigid, automated ATS filters. As a builder, I decided to engineer a solution. 
 
----
-> "Impact-driven Solutions Engineer helping Enterprise teams deploy reliable, scalable Voice & GenAI experiences. From technical discovery to final rollout, I accelerate adoption through high-fidelity PoCs, complex API integrations, and frictionless deal enablement. 20y in Tech experience"
+I built **Jobby**: my self-hosted automation pipeline (Docker on VPS, n8n workflows) that ingests job descriptions, normalizes them into a custom-designed relational Notion database, and leverages LLMs via REST APIs to map requirements against my atomized Notion profile, generating tailored Markdown applications. 
 
-### SELECT PROFESSIONAL EXPERIENCE
+If I deployed this level of engineering just to get this resume into your hands, imagine what I can build, scope, and demonstrate when convincing your largest Enterprise prospects in Paris to adopt Notion’s workspace and AI Agents. With over 20 years in pure tech, complex project coordination, and high-stakes presales, I am ready to be the essential partner on the ground in Paris to optimize internal workflows and scale your local market. Let’s talk.
 
-**Solutions Engineer (Tooling & RFPs Lead)** | Diabolocom | 2025 – Present  
-- Scope and drive high-stakes enterprise sales cycles (discovery, qualification, PoCs), translating complex CX business goals into production-ready architectures involving CRM/ERP sync, TTS automation, and Conversational AI logic.  
-- Industrialize the RFP process and deal enablement workflows (assets, custom storytellings, standardized technical demos), significantly accelerating response times and engineering accuracy.  
+## SELECTED PROFESSIONAL EXPERIENCE
 
-**Presales Engineer** | Valiantys | 2023 – 2025  
-- Delivered deep technical discovery workshops and tailored PoCs for multinational enterprise clients, mapping complex business needs to high-value ITSM/ESM solutions.  
-- Designed advanced integration architectures (APIs, automated workflows) to secure scalable rollouts and accelerate complex sales cycles.  
-- Acted as a key thought leader and speaker at corporate events, presenting AI-driven business solutions (Atlassian Rovo) to audiences of 80+ executives.  
+**Solutions Engineer (Expertise Tooling & RFPs)** | Diabolocom | 2025 – Present
+* Industrialized enterprise responses to RFPs and security questionnaires, standardizing deal collateral to accelerate qualification and shorten sales cycles.
+* Delivered compelling, outcome-driven product demonstrations and technical workshops, translating complex customer constraints into actionable integration plans.
 
-**Presales Engineer** | Claranet | 2019 – 2022  
-- Engineered robust cloud solutions and target architectures focusing on reliability, monitoring, and security for critical, high-availability environments.  
-- Led technical PoCs, scoping, and custom chiffrages, coordinating cross-functional teams (Sales, Delivery, Engineering) to accelerate executive decision-making.  
+**Presales Engineer** | Valiantys | 2023 – 2025
+* Led technical discovery and multi-stakeholder alignment for enterprise opportunities, crafting solution narratives that link technical capabilities to measurable business outcomes.
+* Designed Proof of Concept (PoC) scopes and deployment roadmaps to enable rapid adoption; partnered with Sales and Customer Success teams to de-risk third-party integrations and drive deal closure.
 
-**Technical Project Manager** | Actility | 2015 – 2019  
-- Managed global B2B deployments and technical onboarding across 15+ countries, aligning product and engineering teams with enterprise customer constraints.  
-- Built custom internal automation tools using Python to streamline delivery processes and API integrations.  
+**Presales Solution Architect** | Claranet | 2019 – 2022
+* Provided technical guidance across the entire sales lifecycle (requirements gathering, architecture options, risk/effort trade-offs) to support enterprise-grade decision-making.
+* Built repeatable demo assets and proposal frameworks; ensured customer success by structuring implementation prerequisites, security constraints, and rollout sequencing.
 
-### FEATURED PERSONAL PROJECT
+**Technical Project Manager** | Actility | 2015 – 2019
+* Orchestrated cross-functional delivery in complex technical environments, aligning scope, stakeholders, and execution plans to keep large-scale programs on time and within budget.
+* Structured incident/change management practices and technical documentation to significantly improve system reliability, predictability, and operational continuity.
 
-**"Jobby" – AI-Driven Job Search Automation Pipeline** | 2026  
-- **Infrastructure & Orchestration:** Built and deployed a self-hosted **n8n** workflow completely from scratch on a **VPS** using **Docker** containers.  
-- **Data Architecture & APIs:** Automated live job scraping via custom triggers, processing payload data directly into a centralized **Notion** workspace designed as an atomized CV database.  
-- **GenAI Pipeline:** Implemented LLM integration to automatically map job descriptions against resume atoms, dynamically generating contextual Markdown-based resumes and compiling them into production-ready PDFs via an automated rendering engine.
-
-### TECHNICAL EXPERTISE
-Solution Engineering; Enterprise Pre-sales; Discovery & Stakeholder Mapping; PoC Design & Success Criteria; API/REST Integrations; Automation Workflows (n8n, Zapier, Make); Python & Bash Scripting; Cloud Architecture (AWS, Linux); Knowledge Management & Enablement (Loopio, Notion Certified Expert).
+## TECHNICAL EXPERTISE
+**Notion** (Certified & Power User) • Enterprise Presales • Solutions Engineering • Technical Project Coordination (20+ Years) • RFP & Security Questionnaires • Technical Discovery • Stakeholder Mapping • Value-based Demos • Integration & Deployment Planning • Workflow Automation (n8n, Zapier, Make) • REST APIs (Python, Bash, Javascript) • Relational Databases (Database Design, Relations, Rollups)
 
 ### COGNITIVE AGILITY & RESILIENCE
 * **Improvisational Theater:** 8 years of practice and current Instructor at EFIT (Paris). Developed advanced skills in active listening, instantaneous storytelling, adaptive communication, and high-stakes public speaking.
 * **Ultra-Endurance Sports:** Ultra-trail runner and TDS Finisher (UTMB framework). Proven mental resilience, crisis management, long-term focus, and rigorous execution under extreme constraints.
 
 ### EDUCATION & CERTIFICATIONS
-* **Languages:** French (Native) / English (Bilingual).
-* **AWS Certified Solutions Architect – Associate**  
-* **Notion Certified Expert** (Workflows & Advanced Systems)  
-* **EPITECH** – Master’s equivalent in Computer Science (5-year engineering course)
+* **Engineering Computer Science Course (5-year degree)** | EPITECH – European Institute of Technologies, 2005
+* **AWS Certified Solutions Architect Associate**, 2019
+* **ITILv4**, 2024
