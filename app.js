@@ -596,6 +596,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         resumeOutput.innerHTML = finalHtml;
 
+        // Auto-justify paragraph blocks that contain inline lists / separators (e.g. skills)
+        const paragraphs = resumeOutput.querySelectorAll('p');
+        paragraphs.forEach(p => {
+            const text = p.textContent;
+            if (text.includes('•') || text.includes('·')) {
+                p.style.textAlign = 'justify';
+                p.style.textJustify = 'inter-word';
+            }
+        });
+
         // Dynamic title configuration for PDF filename proposal on printing
         const titleParser = new DOMParser();
         const titleDoc = titleParser.parseFromString(finalHtml, 'text/html');
