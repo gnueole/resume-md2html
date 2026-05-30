@@ -4,11 +4,7 @@
 
 [CONTACT : julien.avarre@example.com | +33 6 00 00 00 00 | https://www.linkedin.com/in/julien-avarre]
 
----
-
 > "Solutions Engineer orienté impact, j'aide les équipes Enterprise à déployer des expériences Voice & GenAI fiables et scalables - de la qualification au rollout - en accélérant l'adoption via des PoC mesurés, des intégrations API et un enablement sans friction."
-
----
 
 ## EXPÉRIENCES CLÉS
 
@@ -28,8 +24,6 @@
 - Gestion et livraison de projets de déploiement réseau LoRaWAN pour de grands comptes IoT.
 - Pilotage technique des intégrations API et support avant-vente sur les architectures IoT complexes.
 
----
-
 ### FORMATION
 
 **Master en Ingénierie des Systèmes d'Information** | École Supérieure d'Informatique | 2012 - 2015
@@ -37,8 +31,6 @@
 
 **Licence en Sciences pour l'Ingénieur** | Université de Technologie | 2009 - 2012
 - Option réseaux et télécommunications.
-
----
 
 ### COMPÉTENCES TECHNIQUES
 
