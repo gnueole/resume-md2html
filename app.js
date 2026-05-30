@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Highlight Sync State
     let lastCleanHTML = "";
     let isHighlightActive = false;
-    let lastActiveCursorEl = null;
     let currentTokens = [];
 
     // Page breaks and formats state
@@ -510,7 +509,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Markdown Parser with Guide Custom Directives & delimiters
     function compileMarkdown(mdText) {
         isHighlightActive = false;
-        lastActiveCursorEl = null;
         if (!mdText.trim()) {
             resumeOutput.innerHTML = `<p style="color:#64748b; font-style:italic;">Start typing Markdown on the left to preview...</p>`;
             lastCleanHTML = resumeOutput.innerHTML;
@@ -1186,111 +1184,61 @@ document.addEventListener('DOMContentLoaded', async () => {
         const start = markdownInput.selectionStart;
         const end = markdownInput.selectionEnd;
         
-        // 1. Text range selection (highlight text in preview)
-        if (start !== end) {
-            // Remove cursor element highlights
-            if (lastActiveCursorEl) {
-                lastActiveCursorEl.classList.remove('active-cursor-element');
-                lastActiveCursorEl = null;
-            }
-
-            // Find all tokens overlapping with the selection [start, end]
-            const overlappingTokens = currentTokens.filter(token => {
-                return token.endOffset > start && token.startOffset < end;
-            });
-            
-            if (overlappingTokens.length === 0) return;
-            
-            // Restore HTML first
-            resumeOutput.innerHTML = lastCleanHTML;
-            isHighlightActive = false;
-            
-            let firstHighlightEl = null;
-            
-            overlappingTokens.forEach(token => {
-                const tokenIndex = currentTokens.indexOf(token);
-                const activeEl = resumeOutput.querySelector(`[data-token-index="${tokenIndex}"]`);
-                if (!activeEl) return;
-                
-                const overlapStart = Math.max(token.startOffset, start);
-                const overlapEnd = Math.min(token.endOffset, end);
-                
-                if (overlapStart >= overlapEnd) return;
-                
-                const tokenRelativeStart = overlapStart - token.startOffset;
-                const tokenRelativeEnd = overlapEnd - token.startOffset;
-                
-                const prefix = token.raw.substring(0, tokenRelativeStart);
-                const selectedText = token.raw.substring(tokenRelativeStart, tokenRelativeEnd);
-                
-                const cleanPrefix = cleanMarkdown(prefix);
-                const cleanSelected = cleanMarkdown(selectedText);
-                
-                const startNonWsCount = countNonWsChars(cleanPrefix);
-                const targetNonWsLen = countNonWsChars(cleanSelected);
-                
-                if (targetNonWsLen > 0) {
-                    highlightNonWsRangeInElement(activeEl, startNonWsCount, targetNonWsLen);
-                    
-                    if (!firstHighlightEl) {
-                        firstHighlightEl = activeEl.querySelector('.editor-twin-highlight');
-                    }
-                    isHighlightActive = true;
-                }
-            });
-            
-            if (firstHighlightEl) {
-                firstHighlightEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (start === end) {
+            if (isHighlightActive) {
+                resumeOutput.innerHTML = lastCleanHTML;
+                isHighlightActive = false;
             }
             return;
         }
-
-        // 2. Collapsed cursor selection (position cursor indicator)
-        if (isHighlightActive) {
-            // Clear highlights if selection is cleared
-            resumeOutput.innerHTML = lastCleanHTML;
-            isHighlightActive = false;
-        }
-
-        // Find the active token the cursor is inside
-        const activeToken = currentTokens.find(token => {
-            return start >= token.startOffset && start <= token.endOffset;
-        });
-
-        if (!activeToken) {
-            if (lastActiveCursorEl) {
-                lastActiveCursorEl.classList.remove('active-cursor-element');
-                lastActiveCursorEl = null;
-            }
-            return;
-        }
-
-        const tokenIndex = currentTokens.indexOf(activeToken);
-        const activeEl = resumeOutput.querySelector(`[data-token-index="${tokenIndex}"]`);
         
-        if (activeEl) {
-            if (lastActiveCursorEl !== activeEl) {
-                // Remove class from previous
-                if (lastActiveCursorEl) {
-                    lastActiveCursorEl.classList.remove('active-cursor-element');
+        // Find all tokens overlapping with the selection [start, end]
+        const overlappingTokens = currentTokens.filter(token => {
+            return token.endOffset > start && token.startOffset < end;
+        });
+        
+        if (overlappingTokens.length === 0) return;
+        
+        // Restore HTML first
+        resumeOutput.innerHTML = lastCleanHTML;
+        isHighlightActive = false;
+        
+        let firstHighlightEl = null;
+        
+        overlappingTokens.forEach(token => {
+            const tokenIndex = currentTokens.indexOf(token);
+            const activeEl = resumeOutput.querySelector(`[data-token-index="${tokenIndex}"]`);
+            if (!activeEl) return;
+            
+            const overlapStart = Math.max(token.startOffset, start);
+            const overlapEnd = Math.min(token.endOffset, end);
+            
+            if (overlapStart >= overlapEnd) return;
+            
+            const tokenRelativeStart = overlapStart - token.startOffset;
+            const tokenRelativeEnd = overlapEnd - token.startOffset;
+            
+            const prefix = token.raw.substring(0, tokenRelativeStart);
+            const selectedText = token.raw.substring(tokenRelativeStart, tokenRelativeEnd);
+            
+            const cleanPrefix = cleanMarkdown(prefix);
+            const cleanSelected = cleanMarkdown(selectedText);
+            
+            const startNonWsCount = countNonWsChars(cleanPrefix);
+            const targetNonWsLen = countNonWsChars(cleanSelected);
+            
+            if (targetNonWsLen > 0) {
+                highlightNonWsRangeInElement(activeEl, startNonWsCount, targetNonWsLen);
+                
+                if (!firstHighlightEl) {
+                    firstHighlightEl = activeEl.querySelector('.editor-twin-highlight');
                 }
-                
-                // Add class and trigger animation restart
-                activeEl.classList.add('active-cursor-element');
-                
-                // Force layout reflow to restart CSS animation
-                void activeEl.offsetWidth;
-                
-                lastActiveCursorEl = activeEl;
-                
-                // Scroll the element into view in the preview window if needed
-                activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                isHighlightActive = true;
             }
-        } else {
-            if (lastActiveCursorEl) {
-                lastActiveCursorEl.classList.remove('active-cursor-element');
-                lastActiveCursorEl = null;
-            }
+        });
+        
+        if (firstHighlightEl) {
+            firstHighlightEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
 
@@ -1301,6 +1249,109 @@ document.addEventListener('DOMContentLoaded', async () => {
             selectionTimeout = setTimeout(handleSelectionChange, 150);
         }
     });
+
+    // --- Editor Cursor Flashing Note Helper ---
+    function getCursorCoordinates(textarea, selectionStart) {
+        let mirror = document.getElementById('textarea-mirror');
+        if (!mirror) {
+            mirror = document.createElement('div');
+            mirror.id = 'textarea-mirror';
+            document.body.appendChild(mirror);
+        }
+        
+        const styles = window.getComputedStyle(textarea);
+        
+        mirror.style.position = 'absolute';
+        mirror.style.visibility = 'hidden';
+        mirror.style.whiteSpace = 'pre-wrap';
+        mirror.style.wordBreak = 'break-word';
+        mirror.style.overflow = 'hidden';
+        
+        // Match physical layout and padding
+        mirror.style.width = textarea.clientWidth + 'px';
+        mirror.style.boxSizing = 'border-box';
+        
+        const props = [
+            'fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'lineHeight',
+            'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft'
+        ];
+        props.forEach(p => {
+            mirror.style[p] = styles[p];
+        });
+        
+        const text = textarea.value.substring(0, selectionStart);
+        mirror.textContent = text;
+        
+        const marker = document.createElement('span');
+        marker.textContent = '|';
+        mirror.appendChild(marker);
+        
+        const markerOffsetLeft = marker.offsetLeft;
+        const markerOffsetTop = marker.offsetTop;
+        
+        const rect = textarea.getBoundingClientRect();
+        
+        const x = rect.left + window.scrollX + markerOffsetLeft - textarea.scrollLeft;
+        const y = rect.top + window.scrollY + markerOffsetTop - textarea.scrollTop;
+        
+        return { x, y };
+    }
+
+    let cursorNoteTimeout;
+    function showFlashingCursorNote(message = "Coucou je suis là") {
+        if (!markdownInput) return;
+        
+        const selectionStart = markdownInput.selectionStart;
+        const coords = getCursorCoordinates(markdownInput, selectionStart);
+        
+        let note = document.getElementById('editor-cursor-note');
+        if (!note) {
+            note = document.createElement('div');
+            note.id = 'editor-cursor-note';
+            note.className = 'cursor-note';
+            document.body.appendChild(note);
+        }
+        
+        note.textContent = message;
+        
+        const arrow = document.createElement('span');
+        arrow.style.position = 'absolute';
+        arrow.style.bottom = '-4px';
+        arrow.style.left = '50%';
+        arrow.style.transform = 'translateX(-50%) rotate(45deg)';
+        arrow.style.width = '8px';
+        arrow.style.height = '8px';
+        arrow.style.backgroundColor = '#6d28d9';
+        note.appendChild(arrow);
+        
+        note.style.left = `${coords.x}px`;
+        note.style.top = `${coords.y}px`;
+        
+        note.classList.remove('show');
+        void note.offsetWidth; // Force animation reflow
+        note.classList.add('show');
+        
+        clearTimeout(cursorNoteTimeout);
+        cursorNoteTimeout = setTimeout(() => {
+            note.classList.remove('show');
+        }, 1500);
+    }
+
+    // Wire editor cursor movement triggers (clicks and arrow navigations)
+    if (markdownInput) {
+        markdownInput.addEventListener('click', () => {
+            setTimeout(() => {
+                showFlashingCursorNote("Coucou je suis là");
+            }, 50);
+        });
+
+        markdownInput.addEventListener('keyup', (e) => {
+            const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End'];
+            if (arrowKeys.includes(e.key)) {
+                showFlashingCursorNote("Coucou je suis là");
+            }
+        });
+    }
 
     // --- Bidirectional Cursor Sync: Preview Click to Editor Cursor Position ---
     let clickStartX = 0;
@@ -1363,6 +1414,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const lineCount = textUpToCursor.split('\n').length;
                 const lineHeight = parseFloat(window.getComputedStyle(markdownInput).lineHeight);
                 markdownInput.scrollTop = Math.max(0, (lineCount - 4) * lineHeight);
+
+                // Show flashing cursor indicator note
+                setTimeout(() => {
+                    showFlashingCursorNote("Coucou je suis là");
+                }, 100);
             }
         });
     }
