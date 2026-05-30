@@ -35,11 +35,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const markdownInput = document.getElementById('markdown-input');
     const resumeOutput = document.getElementById('resume-output');
     const btnPanToggle = document.getElementById('btn-pan-toggle');
+    const btnPageBreaks = document.getElementById('btn-page-breaks');
+    const selectPageFormat = document.getElementById('select-page-format');
     
     // Highlight Sync State
     let lastCleanHTML = "";
     let isHighlightActive = false;
     let currentTokens = [];
+
+    // Page breaks and formats state
+    let showPageBreaks = localStorage.getItem('show_page_breaks') === 'true';
+    let pageFormat = localStorage.getItem('page_format') || 'A4';
 
     // Zoom Controls
     const zoomInBtn = document.getElementById('zoom-in');
@@ -413,6 +419,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         updateZoomDisplay();
+        updatePageBreaks();
     }
 
     let lastSectionsJSON = "";
@@ -684,6 +691,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Perform ATS validation on the actual structured HTML content
         runAtsChecker(mdText, finalHtml);
         lastCleanHTML = resumeOutput.innerHTML;
+        
+        // Refresh page break indicators
+        updatePageBreaks();
     }
 
     // Dynamic ATS Checker Engine
@@ -1214,6 +1224,86 @@ document.addEventListener('DOMContentLoaded', async () => {
             handleSelectionChange();
         }
     });
+
+    // --- Page Guidelines & Breaks Feature ---
+    function updatePageBreaks() {
+        if (!resumeOutput) return;
+
+        // Remove any existing page break indicators
+        const existingBreaks = resumeOutput.querySelectorAll('.page-break-indicator');
+        existingBreaks.forEach(el => el.remove());
+
+        // Toggle letter-format class on the sheet
+        if (pageFormat === "letter") {
+            resumeOutput.classList.add('letter-format');
+        } else {
+            resumeOutput.classList.remove('letter-format');
+        }
+
+        if (!showPageBreaks) return;
+
+        // Calculate total content height
+        const sheetHeight = resumeOutput.scrollHeight;
+        let pageHeightPx = 0;
+
+        // Measure actual page height dynamically using a temp element
+        const tempDiv = document.createElement('div');
+        tempDiv.style.height = pageFormat === "A4" ? '297mm' : '11in';
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.visibility = 'hidden';
+        resumeOutput.appendChild(tempDiv);
+        pageHeightPx = tempDiv.offsetHeight;
+        tempDiv.remove();
+
+        if (pageHeightPx <= 0) return;
+
+        // Draw page break elements
+        const numPages = Math.ceil(sheetHeight / pageHeightPx);
+        for (let i = 1; i < numPages; i++) {
+            const breakLine = document.createElement('div');
+            breakLine.className = 'page-break-indicator';
+            breakLine.style.top = `${i * pageHeightPx}px`;
+
+            const labelSpan = document.createElement('span');
+            labelSpan.textContent = `Page ${i} / ${i + 1}`;
+            breakLine.appendChild(labelSpan);
+
+            resumeOutput.appendChild(breakLine);
+        }
+    }
+
+    if (btnPageBreaks && selectPageFormat) {
+        selectPageFormat.value = pageFormat;
+
+        if (showPageBreaks) {
+            btnPageBreaks.classList.add('active');
+            selectPageFormat.style.display = 'inline-block';
+        } else {
+            btnPageBreaks.classList.remove('active');
+            selectPageFormat.style.display = 'none';
+        }
+
+        btnPageBreaks.addEventListener('click', () => {
+            showPageBreaks = !showPageBreaks;
+            localStorage.setItem('show_page_breaks', showPageBreaks);
+
+            if (showPageBreaks) {
+                btnPageBreaks.classList.add('active');
+                selectPageFormat.style.display = 'inline-block';
+            } else {
+                btnPageBreaks.classList.remove('active');
+                selectPageFormat.style.display = 'none';
+            }
+            updatePageBreaks();
+        });
+
+        selectPageFormat.addEventListener('change', (e) => {
+            pageFormat = e.target.value;
+            localStorage.setItem('page_format', pageFormat);
+            updatePageBreaks();
+            autoFitZoom();
+        });
+    }
 
     // --- Export Node formats for n8n ---
 
