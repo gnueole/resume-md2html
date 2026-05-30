@@ -1250,6 +1250,71 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // --- Bidirectional Cursor Sync: Preview Click to Editor Cursor Position ---
+    let clickStartX = 0;
+    let clickStartY = 0;
+    if (canvasWrapper) {
+        canvasWrapper.addEventListener('mousedown', (e) => {
+            clickStartX = e.clientX;
+            clickStartY = e.clientY;
+        });
+    }
+
+    if (resumeOutput) {
+        resumeOutput.addEventListener('click', (e) => {
+            // Prevent cursor mapping if user was dragging/panning
+            const deltaX = Math.abs(e.clientX - clickStartX);
+            const deltaY = Math.abs(e.clientY - clickStartY);
+            if (deltaX > 5 || deltaY > 5) return;
+
+            const targetEl = e.target;
+            if (!targetEl || targetEl === resumeOutput) return;
+
+            // Find the closest ancestor block mapped to an AST token
+            const tokenEl = targetEl.closest('[data-token-index]');
+            if (!tokenEl) return;
+
+            const tokenIndex = parseInt(tokenEl.getAttribute('data-token-index'), 10);
+            if (isNaN(tokenIndex) || !currentTokens || !currentTokens[tokenIndex]) return;
+
+            const token = currentTokens[tokenIndex];
+            const mdText = markdownInput.value;
+            const tokenRaw = mdText.substring(token.startOffset, token.endOffset);
+
+            let offset = token.startOffset;
+            const targetText = targetEl.textContent.trim();
+
+            if (targetText.length > 0) {
+                // Try exact match within the token raw block
+                let relativeIdx = tokenRaw.indexOf(targetText);
+                
+                // If not found, try a fuzzy match by stripping formatting chars from a snippet
+                if (relativeIdx === -1) {
+                    const cleanSnippet = targetText.substring(0, 15).replace(/[\*\#_`~\[\]]/g, '').trim();
+                    if (cleanSnippet.length >= 3) {
+                        relativeIdx = tokenRaw.indexOf(cleanSnippet);
+                    }
+                }
+
+                if (relativeIdx !== -1) {
+                    offset = token.startOffset + relativeIdx;
+                }
+            }
+
+            // Focus the editor and set cursor position
+            if (markdownInput) {
+                markdownInput.focus();
+                markdownInput.setSelectionRange(offset, offset);
+
+                // Scroll the editor to make the cursor visible
+                const textUpToCursor = mdText.substring(0, offset);
+                const lineCount = textUpToCursor.split('\n').length;
+                const lineHeight = parseFloat(window.getComputedStyle(markdownInput).lineHeight);
+                markdownInput.scrollTop = Math.max(0, (lineCount - 4) * lineHeight);
+            }
+        });
+    }
+
     // --- Page Guidelines & Breaks Feature ---
     function updatePageBreaks() {
         if (!resumeOutput) return;
