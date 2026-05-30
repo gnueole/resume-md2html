@@ -1219,9 +1219,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    let selectionTimeout;
     document.addEventListener('selectionchange', () => {
         if (document.activeElement === markdownInput) {
-            handleSelectionChange();
+            clearTimeout(selectionTimeout);
+            selectionTimeout = setTimeout(handleSelectionChange, 150);
         }
     });
 
