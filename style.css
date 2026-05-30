@@ -176,6 +176,11 @@ body {
     background-image: radial-gradient(circle at 50% 50%, rgba(17, 24, 39, 0.8) 0%, var(--bg-main) 100%);
 }
 
+[data-theme="light"] .app-main {
+    background-image: none;
+    background-color: var(--bg-main);
+}
+
 /* HEADER BUTTON ACTIONS ALIGNMENT */
 .actions {
     display: flex;
@@ -213,19 +218,21 @@ body {
 .resize-handle {
     width: 6px;
     min-width: 6px;
-    background-color: transparent;
+    background-color: var(--bg-panel-header);
     cursor: col-resize;
     position: relative;
     transition: background-color var(--transition-speed), border-color var(--transition-speed);
     z-index: 10;
     align-self: stretch;
     border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
 }
 
 .resize-handle:hover,
 .resize-handle.dragging {
     background-color: var(--accent-glow);
     border-left-color: var(--accent);
+    border-right-color: var(--accent);
 }
 
 .resize-handle::after {
