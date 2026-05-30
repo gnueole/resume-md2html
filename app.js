@@ -420,6 +420,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         updateZoomDisplay();
         updatePageBreaks();
+
+        // Center scroll horizontally and reset vertical scroll to top
+        const centerScroll = () => {
+            canvasWrapper.scrollLeft = (canvasWrapper.scrollWidth - canvasWrapper.clientWidth) / 2;
+            canvasWrapper.scrollTop = 0;
+        };
+        centerScroll();
+        setTimeout(centerScroll, 50); // Ensure layout is fully computed
     }
 
     let lastSectionsJSON = "";
@@ -837,11 +845,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     zoomResetBtn.addEventListener('click', () => {
         isUserZoomed = false;
         autoFitZoom();
+        canvasWrapper.scrollLeft = (canvasWrapper.scrollWidth - canvasWrapper.clientWidth) / 2;
+        canvasWrapper.scrollTop = 0;
     });
 
     zoomLevelText.addEventListener('dblclick', () => {
         isUserZoomed = false;
         autoFitZoom();
+        canvasWrapper.scrollLeft = (canvasWrapper.scrollWidth - canvasWrapper.clientWidth) / 2;
+        canvasWrapper.scrollTop = 0;
     });
 
     // --- About Modal Listeners ---
