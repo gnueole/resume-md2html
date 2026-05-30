@@ -6,12 +6,28 @@ import sys
 import os
 import argparse
 
-# Helper to read .env file without external dependencies
-def load_env():
+# Global configuration variables to be populated by ensure_env()
+API_KEY = None
+WORKFLOW_ID = None
+BASE_URL = None
+N8N_URL = None
+
+def ensure_env():
+    global API_KEY, WORKFLOW_ID, BASE_URL, N8N_URL
     env_path = os.path.join(os.path.dirname(__file__), ".env")
-    if not os.path.exists(env_path):
-        print(f"Error: .env file not found at {env_path}")
-        print("Please create it with N8N_API_KEY, N8N_WORKFLOW_ID, and N8N_BASE_URL.")
+    template = (
+        "# n8n API configuration\n"
+        "N8N_API_KEY=\n"
+        "N8N_WORKFLOW_ID=\n"
+        "N8N_BASE_URL=\n"
+    )
+    
+    # Generate .env if missing or empty (0 bytes)
+    if not os.path.exists(env_path) or os.path.getsize(env_path) == 0:
+        with open(env_path, "w", encoding="utf-8") as f:
+            f.write(template)
+        print(f"Generated default .env file at {env_path}")
+        print("Please fill in N8N_API_KEY, N8N_WORKFLOW_ID, and N8N_BASE_URL before running commands.")
         sys.exit(1)
         
     config = {}
@@ -22,18 +38,17 @@ def load_env():
                 continue
             key, val = line.split("=", 1)
             config[key.strip()] = val.strip()
-    return config
-
-env = load_env()
-API_KEY = env.get("N8N_API_KEY")
-WORKFLOW_ID = env.get("N8N_WORKFLOW_ID")
-BASE_URL = env.get("N8N_BASE_URL", "").rstrip("/")
-
-if not API_KEY or not WORKFLOW_ID or not BASE_URL:
-    print("Error: Missing credentials in .env file (ensure N8N_API_KEY, N8N_WORKFLOW_ID, and N8N_BASE_URL are set).")
-    sys.exit(1)
-
-N8N_URL = f"{BASE_URL}/api/v1/workflows/{WORKFLOW_ID}"
+            
+    API_KEY = config.get("N8N_API_KEY")
+    WORKFLOW_ID = config.get("N8N_WORKFLOW_ID")
+    BASE_URL = config.get("N8N_BASE_URL", "").rstrip("/")
+    
+    if not API_KEY or not WORKFLOW_ID or not BASE_URL:
+        print("Error: Missing credentials in .env file.")
+        print("Please ensure N8N_API_KEY, N8N_WORKFLOW_ID, and N8N_BASE_URL are populated in your .env file.")
+        sys.exit(1)
+        
+    N8N_URL = f"{BASE_URL}/api/v1/workflows/{WORKFLOW_ID}"
 
 # SSL context bypassing validation
 ctx = ssl.create_default_context()
@@ -132,6 +147,10 @@ def main():
     group.add_argument("--activate", action="store_true", help="Activate/Publish the workflow on n8n")
     
     args = parser.parse_args()
+    
+    # Ensure env configuration is loaded and valid for selected action
+    ensure_env()
+    
     backup_file = os.path.join(os.path.dirname(__file__), "workflow_backup.json")
     
     if args.backup:

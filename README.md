@@ -1,57 +1,58 @@
 # jobby MD Editor
 
-Un éditeur de CV Markdown haut de gamme, moderne et respectueux des standards ATS (Applicant Tracking System), conçu pour s'exécuter localement sans dépendance externe lourde.
+A premium, modern Markdown resume editor that respects ATS (Applicant Tracking System) standards, designed to run locally without heavy external dependencies.
 
-Toutes vos modifications de contenu et de styles (couleurs, polices, marges) sont sauvegardées automatiquement dans votre dossier de travail pour vous permettre de reprendre votre travail d'un PC à l'autre via Git.
+All your content and style changes (colors, fonts, margins) are automatically saved in your working folder, allowing you to resume work across machines via Git.
 
 ---
 
-## 🚀 Démarrage Rapide
+## 🚀 Quick Start
 
-Pour lancer l'éditeur sur votre nouvelle machine après avoir fait votre `git pull` :
+To launch the editor on a new machine after performing a `git pull`:
 
-1. Ouvrez votre terminal (PowerShell / Invite de commande) dans le dossier du projet :
+1. Open your terminal (PowerShell / Command Prompt) in the project folder:
    ```powershell
-   cd "chemin/vers/le/dossier/resume MD2HTML"
+   cd "path/to/resume MD2HTML"
    ```
 
-2. Démarrez le serveur local avec Python :
+2. Start the local server with Python:
    ```powershell
    python server.py
    ```
 
-3. Ouvrez votre navigateur et accédez à :
+3. Open your browser and go to:
    👉 **[http://localhost:3000](http://localhost:3000)**
 
 ---
 
-## 📁 Structure des Fichiers du Projet
+## 📁 Project File Structure
 
-- `server.py` : Serveur local ultra-léger en Python (sans dépendances à installer). Il gère l'affichage de l'application et la sauvegarde de vos données sur votre disque.
-- `index.html`, `style.css`, `app.js` : Code source de l'interface d'édition, du système de zoom auto et de l'analyseur ATS.
-- `templates.css` : Styles de rendu pour la page A4 (écran + règles d'impression PDF).
-- `sample.md` : Le modèle de CV par défaut (Julien Avarre) servant d'exemple initial.
-- `resume.md` : **[Généré]** Le fichier contenant vos propres textes en Markdown.
-- `config.json` : **[Généré]** Vos paramètres de mise en page personnalisés (polices choisies, tailles, interlignes, couleurs).
+- `server.py`: Ultra‑lightweight local server written in Python (no dependencies to install). It serves the application and saves your data to disk.
+- `index.html`, `style.css`, `app.js`: Source code for the editing UI, auto‑zoom system, and ATS analyzer.
+- `templates.css`: Rendering styles for A4 page (screen + PDF print rules).
+- `sample.md`: Default resume template (example author) provided as a starting point.
+- `resume.md`: **[Generated]** Your Markdown resume content.
+- `config.json`: **[Generated]** Your custom layout settings (chosen fonts, sizes, line spacing, colors).
 
-*Note : Commiter et pousser `resume.md` et `config.json` sur Git vous permet de synchroniser l'intégralité de vos textes et styles d'une machine à l'autre.*
-
----
-
-## 📝 Directives Spécifiques dans le CV (Guide)
-
-Conformément aux guides standards, vous pouvez utiliser des raccourcis spécifiques dans votre texte Markdown pour styliser votre rendu :
-
-- **Couleur d'accentuation** : Utilisez `:accent[votre texte]` pour colorer des éléments importants (Ex. `:accent[Disponible immédiatement]`).
-- **Texte estompé (gris)** : Utilisez `:muted[votre texte]` pour masquer visuellement des informations secondaires tout en les gardant indexables par les robots ATS (Ex. `:muted[Permis B · Véhiculé]`).
-- **Barre de Contact** : L'éditeur détecte automatiquement la ligne contenant vos emails ou liens et la formate proprement. Vous pouvez également forcer un bloc de contact centré avec la syntaxe `[CONTACT : email | téléphone | linkedin]`.
+*Note: Committing and pushing `resume.md` and `config.json` to Git lets you synchronize all your text and style changes across machines.*
 
 ---
 
-## 🖨️ Générer le PDF pour les Recruteurs
+## 📝 Specific Resume Directives (Guide)
 
-Une fois satisfait de votre mise en page :
-1. Cliquez sur le bouton **Imprimer / PDF** en haut à droite.
-2. Dans la boîte de dialogue d'impression de votre navigateur, sélectionnez **Enregistrer au format PDF** comme destination.
-3. Cochez **Graphiques d'arrière-plan** pour conserver vos couleurs, et décochez **En-têtes et pieds de page** pour un rendu de page propre.
-4. Enregistrez votre fichier !
+Following standard guidelines, you can use special shortcuts in your Markdown to style the output:
+
+- **Accent Color**: Use `:accent[your text]` to color important elements (e.g., `:accent[Immediately available]`).
+- **Muted Text (gray)**: Use `:muted[your text]` to visually de‑emphasize secondary information while keeping it indexable by ATS bots (e.g., `:muted[Driver's license B · Own vehicle]`).
+- **Contact Bar**: The editor automatically detects the line containing your emails or links and formats it neatly. You can also force a centered contact block with the syntax `[CONTACT : email | phone | linkedin]`.
+
+---
+
+## 🖨️ Generate PDF for Recruiters
+
+When you are satisfied with your layout:
+
+1. Click the **Print / PDF** button at the top right.
+2. In your browser’s print dialog, select **Save as PDF** as the destination.
+3. Check **Background graphics** to preserve colors, and uncheck **Headers and footers** for a clean page.
+4. Save the file!

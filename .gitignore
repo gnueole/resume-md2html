@@ -18,7 +18,8 @@ desktop.ini
 *.swp
 
 # Toolkit
-toolkit/
+toolkit/.env
+toolkit/workflow_backup.json
 
 # REX
 REX.md
