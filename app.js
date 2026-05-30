@@ -1321,9 +1321,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             r1.className = 'ripple ripple-1';
             const r2 = document.createElement('div');
             r2.className = 'ripple ripple-2';
+            const r3 = document.createElement('div');
+            r3.className = 'ripple ripple-3';
             
             radar.appendChild(r1);
             radar.appendChild(r2);
+            radar.appendChild(r3);
             document.body.appendChild(radar);
         }
         
@@ -1337,7 +1340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         clearTimeout(cursorRadarTimeout);
         cursorRadarTimeout = setTimeout(() => {
             radar.classList.remove('show');
-        }, 1000);
+        }, 2000);
     }
 
     // Wire editor cursor movement triggers (clicks and arrow navigations)
