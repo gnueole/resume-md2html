@@ -80,6 +80,12 @@
     --slider-track-bg: #cbd5e1; /* Highly visible range slider track line */
 }
 
+html {
+    overflow: hidden;
+    height: 100vh;
+    width: 100%;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -92,7 +98,7 @@ body {
     font-family: var(--font-ui);
     overflow: hidden;
     height: 100vh;
-    width: 100vw;
+    width: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -106,11 +112,19 @@ body {
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Light theme scrollbars override */
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.15);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 23, 42, 0.3);
 }
 
 /* App Container Layout */
