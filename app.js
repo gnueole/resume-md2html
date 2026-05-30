@@ -1180,45 +1180,53 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        // Find token corresponding to selectionStart
-        const activeToken = currentTokens.find(token => start >= token.startOffset && start <= token.endOffset);
-        if (!activeToken) return;
+        // Find all tokens overlapping with the selection [start, end]
+        const overlappingTokens = currentTokens.filter(token => {
+            return token.endOffset > start && token.startOffset < end;
+        });
         
-        const activeTokenIndex = currentTokens.indexOf(activeToken);
+        if (overlappingTokens.length === 0) return;
         
-        const tokenRelativeStart = start - activeToken.startOffset;
-        const tokenRelativeEnd = end - activeToken.startOffset;
+        // Restore HTML first
+        resumeOutput.innerHTML = lastCleanHTML;
+        isHighlightActive = false;
         
-        const prefix = activeToken.raw.substring(0, tokenRelativeStart);
-        const selectedText = activeToken.raw.substring(tokenRelativeStart, tokenRelativeEnd);
+        let firstHighlightEl = null;
         
-        const cleanPrefix = cleanMarkdown(prefix);
-        const cleanSelected = cleanMarkdown(selectedText);
-        
-        const startNonWsCount = countNonWsChars(cleanPrefix);
-        const targetNonWsLen = countNonWsChars(cleanSelected);
-        
-        if (targetNonWsLen > 0) {
-            // Restore HTML first
-            resumeOutput.innerHTML = lastCleanHTML;
-            
-            // Query activeEl AFTER restoring the innerHTML so we get the live DOM node!
-            const activeEl = resumeOutput.querySelector(`[data-token-index="${activeTokenIndex}"]`);
+        overlappingTokens.forEach(token => {
+            const tokenIndex = currentTokens.indexOf(token);
+            const activeEl = resumeOutput.querySelector(`[data-token-index="${tokenIndex}"]`);
             if (!activeEl) return;
             
-            // Highlight in the specific active element
-            highlightNonWsRangeInElement(activeEl, startNonWsCount, targetNonWsLen);
+            const overlapStart = Math.max(token.startOffset, start);
+            const overlapEnd = Math.min(token.endOffset, end);
             
-            const firstHighlight = activeEl.querySelector('.editor-twin-highlight');
-            if (firstHighlight) {
+            if (overlapStart >= overlapEnd) return;
+            
+            const tokenRelativeStart = overlapStart - token.startOffset;
+            const tokenRelativeEnd = overlapEnd - token.startOffset;
+            
+            const prefix = token.raw.substring(0, tokenRelativeStart);
+            const selectedText = token.raw.substring(tokenRelativeStart, tokenRelativeEnd);
+            
+            const cleanPrefix = cleanMarkdown(prefix);
+            const cleanSelected = cleanMarkdown(selectedText);
+            
+            const startNonWsCount = countNonWsChars(cleanPrefix);
+            const targetNonWsLen = countNonWsChars(cleanSelected);
+            
+            if (targetNonWsLen > 0) {
+                highlightNonWsRangeInElement(activeEl, startNonWsCount, targetNonWsLen);
+                
+                if (!firstHighlightEl) {
+                    firstHighlightEl = activeEl.querySelector('.editor-twin-highlight');
+                }
                 isHighlightActive = true;
-                firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
-        } else {
-            if (isHighlightActive) {
-                resumeOutput.innerHTML = lastCleanHTML;
-                isHighlightActive = false;
-            }
+        });
+        
+        if (firstHighlightEl) {
+            firstHighlightEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     }
 
