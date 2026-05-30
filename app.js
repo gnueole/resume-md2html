@@ -1250,7 +1250,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // --- Editor Cursor Flashing Note Helper ---
+    // --- Editor Cursor Flashing Radar Echo Helper ---
     function getCursorCoordinates(textarea, selectionStart) {
         let mirror = document.getElementById('textarea-mirror');
         if (!mirror) {
@@ -1291,64 +1291,67 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const rect = textarea.getBoundingClientRect();
         
+        // Center the radar vertically relative to the line height
+        let lineHeight = parseFloat(styles.lineHeight);
+        if (isNaN(lineHeight)) {
+            const fontSize = parseFloat(styles.fontSize) || 12.5;
+            lineHeight = fontSize * 1.5;
+        }
+        
         const x = rect.left + window.scrollX + markerOffsetLeft - textarea.scrollLeft;
-        const y = rect.top + window.scrollY + markerOffsetTop - textarea.scrollTop;
+        const y = rect.top + window.scrollY + markerOffsetTop - textarea.scrollTop + (lineHeight / 2);
         
         return { x, y };
     }
 
-    let cursorNoteTimeout;
-    function showFlashingCursorNote(message = "Coucou je suis là") {
+    let cursorRadarTimeout;
+    function showFlashingCursorRadar() {
         if (!markdownInput) return;
         
         const selectionStart = markdownInput.selectionStart;
         const coords = getCursorCoordinates(markdownInput, selectionStart);
         
-        let note = document.getElementById('editor-cursor-note');
-        if (!note) {
-            note = document.createElement('div');
-            note.id = 'editor-cursor-note';
-            note.className = 'cursor-note';
-            document.body.appendChild(note);
+        let radar = document.getElementById('editor-cursor-radar');
+        if (!radar) {
+            radar = document.createElement('div');
+            radar.id = 'editor-cursor-radar';
+            radar.className = 'cursor-radar';
+            
+            const r1 = document.createElement('div');
+            r1.className = 'ripple ripple-1';
+            const r2 = document.createElement('div');
+            r2.className = 'ripple ripple-2';
+            
+            radar.appendChild(r1);
+            radar.appendChild(r2);
+            document.body.appendChild(radar);
         }
         
-        note.textContent = message;
+        radar.style.left = `${coords.x}px`;
+        radar.style.top = `${coords.y}px`;
         
-        const arrow = document.createElement('span');
-        arrow.style.position = 'absolute';
-        arrow.style.bottom = '-4px';
-        arrow.style.left = '50%';
-        arrow.style.transform = 'translateX(-50%) rotate(45deg)';
-        arrow.style.width = '8px';
-        arrow.style.height = '8px';
-        arrow.style.backgroundColor = '#6d28d9';
-        note.appendChild(arrow);
+        radar.classList.remove('show');
+        void radar.offsetWidth; // Force animation reflow
+        radar.classList.add('show');
         
-        note.style.left = `${coords.x}px`;
-        note.style.top = `${coords.y}px`;
-        
-        note.classList.remove('show');
-        void note.offsetWidth; // Force animation reflow
-        note.classList.add('show');
-        
-        clearTimeout(cursorNoteTimeout);
-        cursorNoteTimeout = setTimeout(() => {
-            note.classList.remove('show');
-        }, 1500);
+        clearTimeout(cursorRadarTimeout);
+        cursorRadarTimeout = setTimeout(() => {
+            radar.classList.remove('show');
+        }, 1000);
     }
 
     // Wire editor cursor movement triggers (clicks and arrow navigations)
     if (markdownInput) {
         markdownInput.addEventListener('click', () => {
             setTimeout(() => {
-                showFlashingCursorNote("Coucou je suis là");
+                showFlashingCursorRadar();
             }, 50);
         });
 
         markdownInput.addEventListener('keyup', (e) => {
             const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End'];
             if (arrowKeys.includes(e.key)) {
-                showFlashingCursorNote("Coucou je suis là");
+                showFlashingCursorRadar();
             }
         });
     }
@@ -1415,9 +1418,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const lineHeight = parseFloat(window.getComputedStyle(markdownInput).lineHeight);
                 markdownInput.scrollTop = Math.max(0, (lineCount - 4) * lineHeight);
 
-                // Show flashing cursor indicator note
+                // Show flashing cursor radar echo
                 setTimeout(() => {
-                    showFlashingCursorNote("Coucou je suis là");
+                    showFlashingCursorRadar();
                 }, 100);
             }
         });
