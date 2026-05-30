@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Highlight Sync State
     let lastCleanHTML = "";
     let isHighlightActive = false;
+    let lastActiveCursorEl = null;
     let currentTokens = [];
 
     // Page breaks and formats state
@@ -509,6 +510,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Markdown Parser with Guide Custom Directives & delimiters
     function compileMarkdown(mdText) {
         isHighlightActive = false;
+        lastActiveCursorEl = null;
         if (!mdText.trim()) {
             resumeOutput.innerHTML = `<p style="color:#64748b; font-style:italic;">Start typing Markdown on the left to preview...</p>`;
             lastCleanHTML = resumeOutput.innerHTML;
@@ -1184,61 +1186,111 @@ document.addEventListener('DOMContentLoaded', async () => {
         const start = markdownInput.selectionStart;
         const end = markdownInput.selectionEnd;
         
-        if (start === end) {
-            if (isHighlightActive) {
-                resumeOutput.innerHTML = lastCleanHTML;
-                isHighlightActive = false;
+        // 1. Text range selection (highlight text in preview)
+        if (start !== end) {
+            // Remove cursor element highlights
+            if (lastActiveCursorEl) {
+                lastActiveCursorEl.classList.remove('active-cursor-element');
+                lastActiveCursorEl = null;
+            }
+
+            // Find all tokens overlapping with the selection [start, end]
+            const overlappingTokens = currentTokens.filter(token => {
+                return token.endOffset > start && token.startOffset < end;
+            });
+            
+            if (overlappingTokens.length === 0) return;
+            
+            // Restore HTML first
+            resumeOutput.innerHTML = lastCleanHTML;
+            isHighlightActive = false;
+            
+            let firstHighlightEl = null;
+            
+            overlappingTokens.forEach(token => {
+                const tokenIndex = currentTokens.indexOf(token);
+                const activeEl = resumeOutput.querySelector(`[data-token-index="${tokenIndex}"]`);
+                if (!activeEl) return;
+                
+                const overlapStart = Math.max(token.startOffset, start);
+                const overlapEnd = Math.min(token.endOffset, end);
+                
+                if (overlapStart >= overlapEnd) return;
+                
+                const tokenRelativeStart = overlapStart - token.startOffset;
+                const tokenRelativeEnd = overlapEnd - token.startOffset;
+                
+                const prefix = token.raw.substring(0, tokenRelativeStart);
+                const selectedText = token.raw.substring(tokenRelativeStart, tokenRelativeEnd);
+                
+                const cleanPrefix = cleanMarkdown(prefix);
+                const cleanSelected = cleanMarkdown(selectedText);
+                
+                const startNonWsCount = countNonWsChars(cleanPrefix);
+                const targetNonWsLen = countNonWsChars(cleanSelected);
+                
+                if (targetNonWsLen > 0) {
+                    highlightNonWsRangeInElement(activeEl, startNonWsCount, targetNonWsLen);
+                    
+                    if (!firstHighlightEl) {
+                        firstHighlightEl = activeEl.querySelector('.editor-twin-highlight');
+                    }
+                    isHighlightActive = true;
+                }
+            });
+            
+            if (firstHighlightEl) {
+                firstHighlightEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
             return;
         }
-        
-        // Find all tokens overlapping with the selection [start, end]
-        const overlappingTokens = currentTokens.filter(token => {
-            return token.endOffset > start && token.startOffset < end;
+
+        // 2. Collapsed cursor selection (position cursor indicator)
+        if (isHighlightActive) {
+            // Clear highlights if selection is cleared
+            resumeOutput.innerHTML = lastCleanHTML;
+            isHighlightActive = false;
+        }
+
+        // Find the active token the cursor is inside
+        const activeToken = currentTokens.find(token => {
+            return start >= token.startOffset && start <= token.endOffset;
         });
-        
-        if (overlappingTokens.length === 0) return;
-        
-        // Restore HTML first
-        resumeOutput.innerHTML = lastCleanHTML;
-        isHighlightActive = false;
-        
-        let firstHighlightEl = null;
-        
-        overlappingTokens.forEach(token => {
-            const tokenIndex = currentTokens.indexOf(token);
-            const activeEl = resumeOutput.querySelector(`[data-token-index="${tokenIndex}"]`);
-            if (!activeEl) return;
-            
-            const overlapStart = Math.max(token.startOffset, start);
-            const overlapEnd = Math.min(token.endOffset, end);
-            
-            if (overlapStart >= overlapEnd) return;
-            
-            const tokenRelativeStart = overlapStart - token.startOffset;
-            const tokenRelativeEnd = overlapEnd - token.startOffset;
-            
-            const prefix = token.raw.substring(0, tokenRelativeStart);
-            const selectedText = token.raw.substring(tokenRelativeStart, tokenRelativeEnd);
-            
-            const cleanPrefix = cleanMarkdown(prefix);
-            const cleanSelected = cleanMarkdown(selectedText);
-            
-            const startNonWsCount = countNonWsChars(cleanPrefix);
-            const targetNonWsLen = countNonWsChars(cleanSelected);
-            
-            if (targetNonWsLen > 0) {
-                highlightNonWsRangeInElement(activeEl, startNonWsCount, targetNonWsLen);
-                
-                if (!firstHighlightEl) {
-                    firstHighlightEl = activeEl.querySelector('.editor-twin-highlight');
-                }
-                isHighlightActive = true;
+
+        if (!activeToken) {
+            if (lastActiveCursorEl) {
+                lastActiveCursorEl.classList.remove('active-cursor-element');
+                lastActiveCursorEl = null;
             }
-        });
+            return;
+        }
+
+        const tokenIndex = currentTokens.indexOf(activeToken);
+        const activeEl = resumeOutput.querySelector(`[data-token-index="${tokenIndex}"]`);
         
-        if (firstHighlightEl) {
-            firstHighlightEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (activeEl) {
+            if (lastActiveCursorEl !== activeEl) {
+                // Remove class from previous
+                if (lastActiveCursorEl) {
+                    lastActiveCursorEl.classList.remove('active-cursor-element');
+                }
+                
+                // Add class and trigger animation restart
+                activeEl.classList.add('active-cursor-element');
+                
+                // Force layout reflow to restart CSS animation
+                void activeEl.offsetWidth;
+                
+                lastActiveCursorEl = activeEl;
+                
+                // Scroll the element into view in the preview window if needed
+                activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        } else {
+            if (lastActiveCursorEl) {
+                lastActiveCursorEl.classList.remove('active-cursor-element');
+                lastActiveCursorEl = null;
+            }
         }
     }
 

@@ -1206,4 +1206,94 @@ input[type="color"]::-webkit-color-swatch {
     }
 }
 
+/* Active Cursor Indicator & Flash Animation */
+.active-cursor-element {
+    position: relative;
+    transition: outline-color var(--transition-speed);
+}
+
+.active-cursor-element::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 2px;
+    bottom: 2px;
+    width: 3px;
+    background-color: var(--accent);
+    border-radius: 1.5px;
+    animation: cursor-line-flash 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.active-cursor-element::after {
+    content: '✍';
+    position: absolute;
+    left: -28px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: var(--accent);
+    text-shadow: 0 0 8px var(--accent-glow);
+    pointer-events: none;
+    z-index: 20;
+    opacity: 0;
+    animation: cursor-badge-flash 1.2s ease-out forwards;
+}
+
+@keyframes cursor-line-flash {
+    0% {
+        opacity: 0;
+        transform: scaleY(0.3);
+    }
+    30% {
+        opacity: 1;
+        transform: scaleY(1.05);
+        box-shadow: 0 0 10px var(--accent), 0 0 4px var(--accent);
+    }
+    50% {
+        opacity: 0.4;
+        transform: scaleY(0.95);
+    }
+    70% {
+        opacity: 1;
+        transform: scaleY(1);
+        box-shadow: 0 0 6px var(--accent);
+    }
+    100% {
+        opacity: 0.7;
+        transform: scaleY(1);
+        box-shadow: 0 0 3px var(--accent-glow);
+    }
+}
+
+@keyframes cursor-badge-flash {
+    0% {
+        opacity: 0;
+        transform: translateY(-50%) scale(0.6);
+    }
+    20% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1.2);
+    }
+    35% {
+        transform: translateY(-50%) scale(1);
+    }
+    70% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-50%) scale(0.8) translateY(-5px);
+    }
+}
+
+@media print {
+    .active-cursor-element::before,
+    .active-cursor-element::after {
+        display: none !important;
+    }
+}
+
 
