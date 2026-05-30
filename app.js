@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Highlight Sync State
     let lastCleanHTML = "";
     let isHighlightActive = false;
+    let currentTokens = [];
 
     // Zoom Controls
     const zoomInBtn = document.getElementById('zoom-in');
@@ -510,8 +511,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         processedMd = processedMd.replace(/:accent\[([^\]]+)\]/g, '<span class="resume-accent">$1</span>');
         processedMd = processedMd.replace(/:muted\[([^\]]+)\]/g, '<span class="resume-muted">$1</span>');
 
+        // Tokenize and calculate raw source offsets
+        const tokens = marked.lexer(processedMd);
+        let currentOffset = 0;
+        tokens.forEach(token => {
+            token.startOffset = currentOffset;
+            token.endOffset = currentOffset + token.raw.length;
+            currentOffset += token.raw.length;
+        });
+        currentTokens = tokens;
+
         // Compile markdown to HTML
         let html = marked.parse(processedMd);
+
+        // Inject data-token-index into the top-level HTML elements
+        const docParser = new DOMParser();
+        const doc = docParser.parseFromString(html, 'text/html');
+        const bodyElements = Array.from(doc.body.children);
+        const nonSpaceTokens = tokens.filter(t => t.type !== 'space');
+
+        bodyElements.forEach((el, idx) => {
+            const token = nonSpaceTokens[idx];
+            if (token) {
+                const tokenIndex = tokens.indexOf(token);
+                el.setAttribute('data-token-index', tokenIndex);
+            }
+        });
+        html = doc.body.innerHTML;
 
         // 2. Post-process contact block if present: e.g. [CONTACT : text]
         html = html.replace(/\[CONTACT\s*:\s*([^\]]+)\]/gi, (match, contents) => {
@@ -1062,46 +1088,61 @@ document.addEventListener('DOMContentLoaded', async () => {
             .trim();
     }
 
-    function highlightTextInElement(element, textToHighlight) {
-        if (!textToHighlight) return;
+    function countNonWsChars(text) {
+        if (!text) return 0;
+        return text.replace(/\s/g, '').length;
+    }
+
+    function highlightNonWsRangeInElement(element, startNonWsCount, targetNonWsLen) {
+        if (targetNonWsLen <= 0) return;
         
-        const escaped = escapeRegExp(textToHighlight).replace(/\s+/g, '\\s+');
-        const regex = new RegExp(escaped, 'gi');
+        let currentNonWsCount = 0;
+        const endNonWsCount = startNonWsCount + targetNonWsLen;
         
         function walk(node) {
             if (node.nodeType === Node.TEXT_NODE) {
                 const content = node.nodeValue;
-                regex.lastIndex = 0;
-                if (regex.test(content)) {
-                    const parent = node.parentNode;
+                const parent = node.parentNode;
+                
+                let nodeNonWsCount = 0;
+                const nonWsIndices = [];
+                for (let i = 0; i < content.length; i++) {
+                    if (!/\s/.test(content[i])) {
+                        nonWsIndices.push(i);
+                        nodeNonWsCount++;
+                    }
+                }
+                
+                const nodeStartNonWs = currentNonWsCount;
+                const nodeEndNonWs = currentNonWsCount + nodeNonWsCount;
+                
+                if (nodeEndNonWs > startNonWsCount && nodeStartNonWs < endNonWsCount) {
+                    const overlapStartNonWsIdx = Math.max(0, startNonWsCount - nodeStartNonWs);
+                    const overlapEndNonWsIdx = Math.min(nodeNonWsCount, endNonWsCount - nodeStartNonWs);
+                    
+                    const charStart = nonWsIndices[overlapStartNonWsIdx];
+                    const charEnd = nonWsIndices[overlapEndNonWsIdx - 1] + 1;
+                    
                     if (parent && parent.tagName !== 'MARK' && parent.tagName !== 'SCRIPT' && parent.tagName !== 'STYLE') {
                         const fragment = document.createDocumentFragment();
-                        let lastIdx = 0;
-                        regex.lastIndex = 0;
-                        let match;
-                        while ((match = regex.exec(content)) !== null) {
-                            const matchText = match[0];
-                            const matchIdx = match.index;
-                            
-                            if (matchIdx > lastIdx) {
-                                fragment.appendChild(document.createTextNode(content.substring(lastIdx, matchIdx)));
-                            }
-                            
-                            const mark = document.createElement('mark');
-                            mark.className = 'editor-twin-highlight';
-                            mark.textContent = matchText;
-                            fragment.appendChild(mark);
-                            
-                            lastIdx = regex.lastIndex;
+                        
+                        if (charStart > 0) {
+                            fragment.appendChild(document.createTextNode(content.substring(0, charStart)));
                         }
                         
-                        if (lastIdx < content.length) {
-                            fragment.appendChild(document.createTextNode(content.substring(lastIdx)));
+                        const mark = document.createElement('mark');
+                        mark.className = 'editor-twin-highlight';
+                        mark.textContent = content.substring(charStart, charEnd);
+                        fragment.appendChild(mark);
+                        
+                        if (charEnd < content.length) {
+                            fragment.appendChild(document.createTextNode(content.substring(charEnd)));
                         }
                         
                         parent.replaceChild(fragment, node);
                     }
                 }
+                currentNonWsCount += nodeNonWsCount;
             } else if (node.nodeType === Node.ELEMENT_NODE) {
                 if (node.tagName !== 'MARK' && node.tagName !== 'SCRIPT' && node.tagName !== 'STYLE') {
                     const children = Array.from(node.childNodes);
@@ -1111,11 +1152,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
         }
+        
         walk(element);
     }
 
     function handleSelectionChange() {
-        if (!markdownInput || !resumeOutput) return;
+        if (!markdownInput || !resumeOutput || !currentTokens || currentTokens.length === 0) return;
         
         const start = markdownInput.selectionStart;
         const end = markdownInput.selectionEnd;
@@ -1128,14 +1170,33 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         
-        const selectedText = markdownInput.value.substring(start, end);
-        const cleanedText = cleanMarkdown(selectedText);
+        // Find token corresponding to selectionStart
+        const activeToken = currentTokens.find(token => start >= token.startOffset && start <= token.endOffset);
+        if (!activeToken) return;
         
-        if (cleanedText.length >= 2) {
+        const activeTokenIndex = currentTokens.indexOf(activeToken);
+        const activeEl = resumeOutput.querySelector(`[data-token-index="${activeTokenIndex}"]`);
+        if (!activeEl) return;
+        
+        const tokenRelativeStart = start - activeToken.startOffset;
+        const tokenRelativeEnd = end - activeToken.startOffset;
+        
+        const prefix = activeToken.raw.substring(0, tokenRelativeStart);
+        const selectedText = activeToken.raw.substring(tokenRelativeStart, tokenRelativeEnd);
+        
+        const cleanPrefix = cleanMarkdown(prefix);
+        const cleanSelected = cleanMarkdown(selectedText);
+        
+        const startNonWsCount = countNonWsChars(cleanPrefix);
+        const targetNonWsLen = countNonWsChars(cleanSelected);
+        
+        if (targetNonWsLen > 0) {
             resumeOutput.innerHTML = lastCleanHTML;
-            highlightTextInElement(resumeOutput, cleanedText);
             
-            const firstHighlight = resumeOutput.querySelector('.editor-twin-highlight');
+            // Highlight in the specific active element
+            highlightNonWsRangeInElement(activeEl, startNonWsCount, targetNonWsLen);
+            
+            const firstHighlight = activeEl.querySelector('.editor-twin-highlight');
             if (firstHighlight) {
                 isHighlightActive = true;
                 firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
