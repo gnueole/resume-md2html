@@ -1083,3 +1083,41 @@ input[type="color"]::-webkit-color-swatch {
 #btn-theme-toggle svg {
     flex-shrink: 0;
 }
+
+/* Panning Hand Feature */
+.preview-canvas-wrapper.pan-mode {
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.preview-canvas-wrapper.pan-mode:active {
+    cursor: grabbing;
+}
+
+.preview-canvas-wrapper.pan-mode * {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+
+/* Styles for active state of circle buttons */
+.btn-circle-sm.active {
+    background: var(--accent);
+    color: white;
+}
+.btn-circle-sm.active:hover {
+    background: var(--accent-hover);
+    color: white;
+}
+
+/* Editor Selection Sync Highlight */
+.editor-twin-highlight {
+    background-color: rgba(124, 58, 237, 0.25);
+    border-bottom: 2px solid var(--accent);
+    border-radius: 2px;
+    padding: 0 1px;
+    color: inherit;
+    box-shadow: 0 0 4px rgba(124, 58, 237, 0.4);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+

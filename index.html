@@ -98,6 +98,14 @@
                 <div class="panel-header">
                     <span class="status-indicator preview-dot">● PREVIEW</span>
                     <div class="preview-controls">
+                        <button id="btn-pan-toggle" class="btn-circle-sm active" title="Toggle Pan Mode (Hand)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v5" />
+                                <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v6" />
+                                <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8" />
+                                <path d="M6 14v4a5 5 0 0 0 10 0v-3.5" />
+                            </svg>
+                        </button>
                         <button id="zoom-out" class="btn-circle-sm" title="Zoom out">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         </button>
@@ -113,7 +121,7 @@
                     </div>
                 </div>
                 
-                <div class="preview-canvas-wrapper">
+                <div class="preview-canvas-wrapper pan-mode">
                     <div class="preview-canvas" id="preview-canvas">
                         <!-- Simulated A4 Document sheet -->
                         <article class="a4-sheet" id="resume-output">

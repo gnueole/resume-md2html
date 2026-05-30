@@ -34,7 +34,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- DOM Elements Cache ---
     const markdownInput = document.getElementById('markdown-input');
     const resumeOutput = document.getElementById('resume-output');
+    const btnPanToggle = document.getElementById('btn-pan-toggle');
     
+    // Highlight Sync State
+    let lastCleanHTML = "";
+    let isHighlightActive = false;
+
     // Zoom Controls
     const zoomInBtn = document.getElementById('zoom-in');
     const zoomOutBtn = document.getElementById('zoom-out');
@@ -487,8 +492,10 @@ document.addEventListener('DOMContentLoaded', async () => {
  
     // Markdown Parser with Guide Custom Directives & delimiters
     function compileMarkdown(mdText) {
+        isHighlightActive = false;
         if (!mdText.trim()) {
             resumeOutput.innerHTML = `<p style="color:#64748b; font-style:italic;">Start typing Markdown on the left to preview...</p>`;
+            lastCleanHTML = resumeOutput.innerHTML;
             return;
         }
 
@@ -650,6 +657,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Perform ATS validation on the actual structured HTML content
         runAtsChecker(mdText, finalHtml);
+        lastCleanHTML = resumeOutput.innerHTML;
     }
 
     // Dynamic ATS Checker Engine
@@ -993,6 +1001,158 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Handle Auto-Fit Zoom on window resize
     window.addEventListener('resize', autoFitZoom);
+
+    // --- Panning Hand Mode Feature ---
+    let isPanMode = true; // Enabled by default
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let startScrollLeft = 0;
+    let startScrollTop = 0;
+
+    if (btnPanToggle && canvasWrapper) {
+        // Ensure initial classes are in sync
+        canvasWrapper.classList.add('pan-mode');
+        btnPanToggle.classList.add('active');
+
+        btnPanToggle.addEventListener('click', () => {
+            isPanMode = !isPanMode;
+            if (isPanMode) {
+                btnPanToggle.classList.add('active');
+                canvasWrapper.classList.add('pan-mode');
+            } else {
+                btnPanToggle.classList.remove('active');
+                canvasWrapper.classList.remove('pan-mode');
+                isDragging = false;
+            }
+        });
+
+        canvasWrapper.addEventListener('mousedown', (e) => {
+            if (!isPanMode) return;
+            if (e.button !== 0) return; // Only left click
+            
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startScrollLeft = canvasWrapper.scrollLeft;
+            startScrollTop = canvasWrapper.scrollTop;
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || !isPanMode) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            canvasWrapper.scrollLeft = startScrollLeft - dx;
+            canvasWrapper.scrollTop = startScrollTop - dy;
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+    }
+
+    // --- Selection Sync & Highlight ---
+    function cleanMarkdown(text) {
+        if (!text) return "";
+        return text
+            .replace(/^(#+\s*|-\s*|\*\s*|\+\s*)/gm, '') // Remove list bullets/headers at beginning of lines
+            .replace(/[\*\#_`~]/g, '')                // Remove inline markdown markers
+            .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Convert links [text](url) to just text
+            .trim();
+    }
+
+    function highlightTextInElement(element, textToHighlight) {
+        if (!textToHighlight) return;
+        
+        const escaped = escapeRegExp(textToHighlight).replace(/\s+/g, '\\s+');
+        const regex = new RegExp(escaped, 'gi');
+        
+        function walk(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const content = node.nodeValue;
+                regex.lastIndex = 0;
+                if (regex.test(content)) {
+                    const parent = node.parentNode;
+                    if (parent && parent.tagName !== 'MARK' && parent.tagName !== 'SCRIPT' && parent.tagName !== 'STYLE') {
+                        const fragment = document.createDocumentFragment();
+                        let lastIdx = 0;
+                        regex.lastIndex = 0;
+                        let match;
+                        while ((match = regex.exec(content)) !== null) {
+                            const matchText = match[0];
+                            const matchIdx = match.index;
+                            
+                            if (matchIdx > lastIdx) {
+                                fragment.appendChild(document.createTextNode(content.substring(lastIdx, matchIdx)));
+                            }
+                            
+                            const mark = document.createElement('mark');
+                            mark.className = 'editor-twin-highlight';
+                            mark.textContent = matchText;
+                            fragment.appendChild(mark);
+                            
+                            lastIdx = regex.lastIndex;
+                        }
+                        
+                        if (lastIdx < content.length) {
+                            fragment.appendChild(document.createTextNode(content.substring(lastIdx)));
+                        }
+                        
+                        parent.replaceChild(fragment, node);
+                    }
+                }
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                if (node.tagName !== 'MARK' && node.tagName !== 'SCRIPT' && node.tagName !== 'STYLE') {
+                    const children = Array.from(node.childNodes);
+                    for (let child of children) {
+                        walk(child);
+                    }
+                }
+            }
+        }
+        walk(element);
+    }
+
+    function handleSelectionChange() {
+        if (!markdownInput || !resumeOutput) return;
+        
+        const start = markdownInput.selectionStart;
+        const end = markdownInput.selectionEnd;
+        
+        if (start === end) {
+            if (isHighlightActive) {
+                resumeOutput.innerHTML = lastCleanHTML;
+                isHighlightActive = false;
+            }
+            return;
+        }
+        
+        const selectedText = markdownInput.value.substring(start, end);
+        const cleanedText = cleanMarkdown(selectedText);
+        
+        if (cleanedText.length >= 2) {
+            resumeOutput.innerHTML = lastCleanHTML;
+            highlightTextInElement(resumeOutput, cleanedText);
+            
+            const firstHighlight = resumeOutput.querySelector('.editor-twin-highlight');
+            if (firstHighlight) {
+                isHighlightActive = true;
+                firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        } else {
+            if (isHighlightActive) {
+                resumeOutput.innerHTML = lastCleanHTML;
+                isHighlightActive = false;
+            }
+        }
+    }
+
+    document.addEventListener('selectionchange', () => {
+        if (document.activeElement === markdownInput) {
+            handleSelectionChange();
+        }
+    });
 
     // --- Export Node formats for n8n ---
 
