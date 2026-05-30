@@ -199,17 +199,19 @@ body {
 .resize-handle {
     width: 6px;
     min-width: 6px;
-    background-color: var(--border-color);
+    background-color: transparent;
     cursor: col-resize;
     position: relative;
-    transition: background-color 0.2s;
+    transition: background-color var(--transition-speed), border-color var(--transition-speed);
     z-index: 10;
     align-self: stretch;
+    border-left: 1px solid var(--border-color);
 }
 
 .resize-handle:hover,
 .resize-handle.dragging {
-    background-color: var(--accent);
+    background-color: var(--accent-glow);
+    border-left-color: var(--accent);
 }
 
 .resize-handle::after {
