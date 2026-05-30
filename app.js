@@ -1185,8 +1185,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!activeToken) return;
         
         const activeTokenIndex = currentTokens.indexOf(activeToken);
-        const activeEl = resumeOutput.querySelector(`[data-token-index="${activeTokenIndex}"]`);
-        if (!activeEl) return;
         
         const tokenRelativeStart = start - activeToken.startOffset;
         const tokenRelativeEnd = end - activeToken.startOffset;
@@ -1201,7 +1199,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const targetNonWsLen = countNonWsChars(cleanSelected);
         
         if (targetNonWsLen > 0) {
+            // Restore HTML first
             resumeOutput.innerHTML = lastCleanHTML;
+            
+            // Query activeEl AFTER restoring the innerHTML so we get the live DOM node!
+            const activeEl = resumeOutput.querySelector(`[data-token-index="${activeTokenIndex}"]`);
+            if (!activeEl) return;
             
             // Highlight in the specific active element
             highlightNonWsRangeInElement(activeEl, startNonWsCount, targetNonWsLen);
